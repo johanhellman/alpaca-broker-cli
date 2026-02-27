@@ -29,3 +29,6 @@ This repository contains **two distinct CLI executables** built in Go using the 
 ## ✅ Coding Standards
 - Do not introduce new third-party CLI or Configuration frameworks; rigorously stick to `cobra` and `viper`.
 - Prefer implementing explicit, native command-line flags (e.g., `--limit 50`, `--status ACTIVE`) rather than requiring users to pass raw JSON payload files (`--file`) whenever implementing new REST API bindings.
+- **Error Handling**: NEVER use `log.Fatal` or `panic` in library/helper functions or command executions. Always return errors up the stack to be handled gracefully by Cobra's `RunE`.
+- **API Requests**: Always use `context.WithTimeout` when making calls to the Alpaca API; never use an unbounded `context.Background()`.
+- **Output Formatting**: Ensure all CLI outputs dynamically respect the global `--output` flag (e.g., formatting as a clean table vs raw JSON). Avoid hardcoding massive JSON dumps.
