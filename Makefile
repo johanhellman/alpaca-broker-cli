@@ -1,18 +1,25 @@
-.PHONY: build install test generate clean
+.PHONY: build build-broker build-trader install test generate clean
 
-APP_NAME = alpaca-cli
+BROKER_APP_NAME = alpaca-broker
+TRADER_APP_NAME = alpaca-trader
 
-build:
-	go build -o $(APP_NAME) main.go
+build: build-broker build-trader
 
-install:
-	go install
+build-broker:
+	go build -o $(BROKER_APP_NAME) cmd/broker/main/main.go
+
+build-trader:
+	go build -o $(TRADER_APP_NAME) cmd/trader/main/main.go
+
+install: build
+	go install ./cmd/broker/main
+	# go install ./cmd/trader/main (uncomment when implemented)
 
 test:
 	go test ./...
 
 generate:
-	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest -generate types,client -package client api/openapi.yaml > pkg/client/client.gen.go
+	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest -generate types,client -package brokerclient api/openapi.yaml > pkg/brokerclient/client.gen.go
 
 clean:
-	rm -f $(APP_NAME)
+	rm -f $(BROKER_APP_NAME) $(TRADER_APP_NAME)

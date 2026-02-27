@@ -1,10 +1,12 @@
-# Alpaca Broker CLI
+# Alpaca CLI Tools
 
-`alpaca-cli` is a command-line interface for the [Alpaca Broker API](https://docs.alpaca.markets/docs/about-broker-api). It allows you to quickly manage accounts, transfers, and orders using a seamless terminal experience.
+A suite of powerful command-line interfaces for interacting with the Alpaca API ecosystem. This repository contains two distinct binaries:
+1. `alpaca-broker` - For managing B2B broker operations (accounts, funding, sub-account trading) via the Broker API.
+2. `alpaca-trader` - For managing individual retail/paper trading (account info, positions, orders) via the Trading API.
 
 ## Installation
 
-This project requires Go. To install locally:
+This project requires Go 1.26+. To install locally:
 
 ```bash
 git clone https://github.com/johanhellman/alpaca-broker-cli.git
@@ -12,69 +14,67 @@ cd alpaca-broker-cli
 make install
 ```
 
-Ensure `$GOPATH/bin` is in your `PATH`.
+This will build and install both `alpaca-broker` and `alpaca-trader` into your `$GOPATH/bin`. Ensure `$GOPATH/bin` is in your `$PATH`.
 
 ## Configuration
 
-You can provide your API credentials via command-line flags, environment variables, or a YAML configuration file (`~/.alpaca-cli.yaml`).
+Both tools accept configuration via environment variables, flags, or a local YAML config file.
 
-**Environment Variables:**
-```bash
-export ALPACA_BROKER_API_KEY="your-api-key"
-export ALPACA_BROKER_API_SECRET="your-api-secret"
-export ALPACA_BROKER_ENV="sandbox" # or "production"
-```
-
-**Config File (`~/.alpaca-cli.yaml`):**
+### Broker Config (`~/.alpaca-broker.yaml`)
 ```yaml
-api-key: "your-api-key"
-api-secret: "your-api-secret"
-env: "sandbox"
+api-key: "broker-api-key"
+api-secret: "broker-api-secret"
+env: "sandbox" # or production
 ```
+Environment Variable Fallbacks: `ALPACA_BROKER_API_KEY`, `ALPACA_BROKER_API_SECRET`, `ALPACA_BROKER_ENV`
 
-## Quick Start
+### Trader Config (`~/.alpaca-trader.yaml`)
+```yaml
+api-key: "trader-api-key"
+api-secret: "trader-api-secret"
+env: "paper" # or live
+```
+Environment Variable Fallbacks: `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY`, `APCA_ENV`
+
+## Quick Start: Broker API
 
 ### Accounts
-
-List all accounts:
 ```bash
-alpaca-cli accounts list
-```
-
-Get a specific account:
-```bash
-alpaca-cli accounts get <account_uuid>
-```
-
-Create a new account:
-```bash
-alpaca-cli accounts create --file account_payload.json
+alpaca-broker accounts list
+alpaca-broker accounts create --file account_payload.json
 ```
 
 ### Funding
-
-List transfers for an account:
 ```bash
-alpaca-cli funding transfers <account_uuid>
+alpaca-broker funding transfers <account_uuid>
 ```
 
-Create a transfer:
+### Trading (Sub-accounts)
 ```bash
-alpaca-cli funding transfer-create <account_uuid> --file transfer_payload.json
+alpaca-broker trading orders <account_uuid>
 ```
 
-### Trading
+## Quick Start: Trading API
 
-List orders for an account:
+### Auto-authenticate with Env Vars
 ```bash
-alpaca-cli trading orders <account_uuid>
+export APCA_API_KEY_ID="yourkey"
+export APCA_API_SECRET_KEY="yoursecret"
+export APCA_ENV="paper"
 ```
 
-Create an order:
+### Account & Positions
 ```bash
-alpaca-cli trading order-create <account_uuid> --file order_payload.json
+alpaca-trader account get
+alpaca-trader positions list
+```
+
+### Orders
+```bash
+alpaca-trader orders list
+alpaca-trader orders create --file order.json
 ```
 
 ## Documentation
 
-Full command documentation can be found in the [docs/](./docs/) directory.
+Full command documentation for `alpaca-broker` can be found in the `docs/` folder (generated via `make generate`).
