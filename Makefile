@@ -13,7 +13,7 @@ build-trader:
 
 install: build
 	go install ./cmd/broker/main
-	# go install ./cmd/trader/main (uncomment when implemented)
+	go install ./cmd/trader/main
 
 test:
 	go test ./...
