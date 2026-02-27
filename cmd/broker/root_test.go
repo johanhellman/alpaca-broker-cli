@@ -12,11 +12,11 @@ import (
 func TestInitConfig_Env(t *testing.T) {
 	// Clear existing viper instance for test isolation
 	viper.Reset()
-	
-	// Set environment variables
-	os.Setenv("ALPACA_BROKER_API_KEY", "test-key")
-	os.Setenv("ALPACA_BROKER_API_SECRET", "test-secret")
-	os.Setenv("ALPACA_BROKER_ENV", "production")
+
+	// Set up environment variables
+	os.Setenv("ALPACA_BROKER_API_KEY", "test-key")       //nolint:errcheck
+	os.Setenv("ALPACA_BROKER_API_SECRET", "test-secret") //nolint:errcheck
+	os.Setenv("ALPACA_BROKER_ENV", "production")         //nolint:errcheck
 
 	// Call our setup
 	initConfig()
@@ -26,10 +26,10 @@ func TestInitConfig_Env(t *testing.T) {
 	assert.Equal(t, "test-secret", viper.GetString("api-secret"))
 	assert.Equal(t, "production", viper.GetString("env"))
 
-	// Clean up
-	os.Unsetenv("ALPACA_BROKER_API_KEY")
-	os.Unsetenv("ALPACA_BROKER_API_SECRET")
-	os.Unsetenv("ALPACA_BROKER_ENV")
+	// Clean up environment variables
+	os.Unsetenv("ALPACA_BROKER_API_KEY")    //nolint:errcheck
+	os.Unsetenv("ALPACA_BROKER_API_SECRET") //nolint:errcheck
+	os.Unsetenv("ALPACA_BROKER_ENV")        //nolint:errcheck
 }
 
 func TestExecuteCommand(t *testing.T) {
@@ -38,7 +38,7 @@ func TestExecuteCommand(t *testing.T) {
 	cmd.SetOut(b)
 	cmd.SetErr(b)
 	cmd.SetArgs([]string{"--help"})
-	
+
 	err := cmd.Execute()
 	assert.NoError(t, err)
 

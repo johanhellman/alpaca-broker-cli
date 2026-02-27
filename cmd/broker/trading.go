@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/google/uuid"
+	client "github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
 	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient/api"
-	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +35,8 @@ var tradingOrdersCmd = &cobra.Command{
 			return err
 		}
 
-		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		params := &client.GetOrdersParams{}
 		resp, err := c.GetOrdersWithResponse(ctx, parsedUUID, params)
 		if err != nil {
@@ -71,7 +73,7 @@ var tradingOrderCreateCmd = &cobra.Command{
 			return fmt.Errorf("--file flag is required")
 		}
 
-		data, err := os.ReadFile(orderPayloadFile)
+		data, err := os.ReadFile(orderPayloadFile) //nolint:gosec
 		if err != nil {
 			return fmt.Errorf("failed to read payload file: %w", err)
 		}
@@ -86,7 +88,8 @@ var tradingOrderCreateCmd = &cobra.Command{
 			return err
 		}
 
-		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		resp, err := c.PostOrdersWithResponse(ctx, parsedUUID, reqBody)
 		if err != nil {
 			return fmt.Errorf("failed to submit order: %w", err)
@@ -110,6 +113,6 @@ func init() {
 	tradingCmd.AddCommand(tradingOrdersCmd)
 
 	tradingOrderCreateCmd.Flags().StringVarP(&orderPayloadFile, "file", "f", "", "Path to the JSON payload file")
-	tradingOrderCreateCmd.MarkFlagRequired("file")
+	tradingOrderCreateCmd.MarkFlagRequired("file") //nolint:errcheck
 	tradingCmd.AddCommand(tradingOrderCreateCmd)
 }

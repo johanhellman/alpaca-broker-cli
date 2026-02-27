@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -47,18 +49,18 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.alpaca-cli.yaml)")
-	
+
 	rootCmd.PersistentFlags().String("api-key", "", "Alpaca Broker API Key")
-	viper.BindPFlag("api-key", rootCmd.PersistentFlags().Lookup("api-key"))
+	_ = viper.BindPFlag("api-key", rootCmd.PersistentFlags().Lookup("api-key")) //nolint:errcheck
 
 	rootCmd.PersistentFlags().String("api-secret", "", "Alpaca Broker API Secret")
-	viper.BindPFlag("api-secret", rootCmd.PersistentFlags().Lookup("api-secret"))
+	_ = viper.BindPFlag("api-secret", rootCmd.PersistentFlags().Lookup("api-secret")) //nolint:errcheck
 
 	rootCmd.PersistentFlags().String("env", "sandbox", "Alpaca environment (sandbox or production)")
-	viper.BindPFlag("env", rootCmd.PersistentFlags().Lookup("env"))
+	_ = viper.BindPFlag("env", rootCmd.PersistentFlags().Lookup("env")) //nolint:errcheck
 
 	rootCmd.PersistentFlags().String("output", "table", "Output format (table or json)")
-	viper.BindPFlag("output", rootCmd.PersistentFlags().Lookup("output"))
+	_ = viper.BindPFlag("output", rootCmd.PersistentFlags().Lookup("output")) //nolint:errcheck
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -87,4 +89,56 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+// printOutput formats data as JSON or Table based on the `--output` flag.
+func printOutput(data interface{}) error {
+	outputFormat := viper.GetString("output")
+
+	if outputFormat == "table" {
+		// A completely generic table printer using reflection for standard arrays of structs.
+		val := reflect.Indirect(reflect.ValueOf(data))
+		if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
+			// If it's a single struct, wrap it in a slice for the table printer
+			slice := reflect.MakeSlice(reflect.SliceOf(val.Type()), 0, 1)
+			val = reflect.Append(slice, val)
+		}
+
+		if val.Len() == 0 {
+			fmt.Println("No data found.")
+			return nil
+		}
+
+		// Print Headers
+		firstElement := reflect.Indirect(val.Index(0))
+		if firstElement.Kind() == reflect.Struct {
+			for i := 0; i < firstElement.NumField(); i++ {
+				fmt.Printf("%-20v\t", firstElement.Type().Field(i).Name)
+			}
+			fmt.Println()
+		}
+
+		// Print Values
+		for i := 0; i < val.Len(); i++ {
+			element := reflect.Indirect(val.Index(i))
+			if element.Kind() == reflect.Struct {
+				for j := 0; j < element.NumField(); j++ {
+					field := element.Field(j)
+					fmt.Printf("%-20v\t", field.Interface())
+				}
+				fmt.Println()
+			} else {
+				fmt.Println(element.Interface())
+			}
+		}
+		return nil
+	}
+
+	// Default: JSON output
+	out, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(out))
+	return nil
 }

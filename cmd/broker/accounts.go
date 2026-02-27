@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/google/uuid"
+	client "github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
 	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient/api"
-	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +30,8 @@ var accountsListCmd = &cobra.Command{
 			return err
 		}
 
-		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		// For MVP, we'll just fetch with empty params.
 		params := &client.GetAccountsParams{}
 		resp, err := c.GetAccountsWithResponse(ctx, params)
@@ -59,13 +62,14 @@ var accountsGetCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("invalid account ID format: %w", err)
 		}
-		
+
 		c, err := api.NewClient()
 		if err != nil {
 			return err
 		}
 
-		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		resp, err := c.GetAccountWithResponse(ctx, parsedUUID)
 		if err != nil {
 			return fmt.Errorf("failed to get account: %w", err)
@@ -97,12 +101,13 @@ Example:
 			return fmt.Errorf("--file flag is required")
 		}
 
-		data, err := os.ReadFile(payloadFile)
+		cleanFile := filepath.Clean(payloadFile)
+		data, err := os.ReadFile(cleanFile)
 		if err != nil {
 			return fmt.Errorf("failed to read payload file: %w", err)
 		}
 
-		var reqBody client.AccountCreationRequest
+		var reqBody client.PostAccountsJSONRequestBody
 		if err := json.Unmarshal(data, &reqBody); err != nil {
 			return fmt.Errorf("failed to parse JSON payload: %w", err)
 		}
@@ -112,7 +117,8 @@ Example:
 			return err
 		}
 
-		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		resp, err := c.PostAccountsWithResponse(ctx, reqBody)
 		if err != nil {
 			return fmt.Errorf("failed to create account: %w", err)
@@ -123,12 +129,7 @@ Example:
 			return fmt.Errorf("unexpected response status: %d, body: %s", resp.StatusCode(), string(resp.Body))
 		}
 
-		out, err := json.MarshalIndent(resp.JSON200, "", "  ")
-		if err != nil {
-			return err
-		}
-		fmt.Println(string(out))
-		return nil
+		return printOutput(resp.JSON200)
 	},
 }
 
@@ -136,8 +137,8 @@ func init() {
 	rootCmd.AddCommand(accountsCmd)
 	accountsCmd.AddCommand(accountsListCmd)
 	accountsCmd.AddCommand(accountsGetCmd)
-	
+
 	accountsCreateCmd.Flags().StringVarP(&payloadFile, "file", "f", "", "Path to the JSON payload file")
-	accountsCreateCmd.MarkFlagRequired("file")
+	accountsCreateCmd.MarkFlagRequired("file") //nolint:errcheck
 	accountsCmd.AddCommand(accountsCreateCmd)
 }

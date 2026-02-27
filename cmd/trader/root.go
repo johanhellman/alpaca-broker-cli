@@ -10,6 +10,7 @@ import (
 
 var cfgFile string
 
+// RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "alpaca-trader",
 	Short: "A CLI tool for the Alpaca Trading API",
@@ -23,6 +24,7 @@ Example:
 Set APCA_API_KEY_ID and APCA_API_SECRET_KEY in your environment to authenticate.`,
 }
 
+// Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
 	err := RootCmd.Execute()
 	if err != nil {
@@ -34,15 +36,18 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.alpaca-trader.yaml)")
-	RootCmd.PersistentFlags().String("api-key", "", "Alpaca Trading API Key ID")
-	RootCmd.PersistentFlags().String("api-secret", "", "Alpaca Trading API Secret Key")
-	RootCmd.PersistentFlags().String("env", "paper", "Alpaca environment (paper or live)")
-	RootCmd.PersistentFlags().String("output", "table", "Output format (table or json)")
 
-	viper.BindPFlag("api-key", RootCmd.PersistentFlags().Lookup("api-key"))
-	viper.BindPFlag("api-secret", RootCmd.PersistentFlags().Lookup("api-secret"))
-	viper.BindPFlag("env", RootCmd.PersistentFlags().Lookup("env"))
-	viper.BindPFlag("output", RootCmd.PersistentFlags().Lookup("output"))
+	RootCmd.PersistentFlags().String("api-key", "", "Alpaca API Key ID")
+	_ = viper.BindPFlag("api-key", RootCmd.PersistentFlags().Lookup("api-key")) //nolint:errcheck
+
+	RootCmd.PersistentFlags().String("api-secret", "", "Alpaca API Secret Key")
+	_ = viper.BindPFlag("api-secret", RootCmd.PersistentFlags().Lookup("api-secret")) //nolint:errcheck
+
+	RootCmd.PersistentFlags().String("env", "paper", "Alpaca environment (paper or live)")
+	_ = viper.BindPFlag("env", RootCmd.PersistentFlags().Lookup("env")) //nolint:errcheck
+
+	RootCmd.PersistentFlags().String("output", "table", "Output format (table or json)")
+	_ = viper.BindPFlag("output", RootCmd.PersistentFlags().Lookup("output")) //nolint:errcheck
 }
 
 func initConfig() {
@@ -58,8 +63,9 @@ func initConfig() {
 	}
 
 	viper.SetEnvPrefix("APCA")
-	viper.BindEnv("api-key", "APCA_API_KEY_ID")
-	viper.BindEnv("api-secret", "APCA_API_SECRET_KEY")
+	// Also support the standard APCA_ environment variables directly
+	viper.BindEnv("api-key", "APCA_API_KEY_ID")        //nolint:errcheck
+	viper.BindEnv("api-secret", "APCA_API_SECRET_KEY") //nolint:errcheck
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {

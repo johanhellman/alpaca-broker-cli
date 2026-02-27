@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
+	client "github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
 	"github.com/spf13/viper"
 )
 
@@ -18,17 +18,17 @@ const (
 
 // AddAuthHeader adds the Auth headers to the request.
 type authProvider struct {
-	ApiKey    string
-	ApiSecret string
+	APIKey    string
+	APISecret string
 	IsPaper   bool
 }
 
 func (p *authProvider) Intercept(ctx context.Context, req *http.Request) error {
 	if p.IsPaper {
-		req.Header.Set("APCA-API-KEY-ID", p.ApiKey)
-		req.Header.Set("APCA-API-SECRET-KEY", p.ApiSecret)
+		req.Header.Set("APCA-API-KEY-ID", p.APIKey)
+		req.Header.Set("APCA-API-SECRET-KEY", p.APISecret)
 	} else {
-		req.SetBasicAuth(p.ApiKey, p.ApiSecret)
+		req.SetBasicAuth(p.APIKey, p.APISecret)
 	}
 	return nil
 }
@@ -55,8 +55,8 @@ func NewClient() (*client.ClientWithResponses, error) {
 	}
 
 	provider := &authProvider{
-		ApiKey:    apiKey,
-		ApiSecret: apiSecret,
+		APIKey:    apiKey,
+		APISecret: apiSecret,
 		IsPaper:   isPaper,
 	}
 

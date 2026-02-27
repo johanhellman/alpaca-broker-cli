@@ -1,4 +1,4 @@
-.PHONY: build build-broker build-trader install test generate clean
+.PHONY: build build-broker build-trader install test generate clean lint
 
 BROKER_APP_NAME = alpaca-broker
 TRADER_APP_NAME = alpaca-trader
@@ -24,3 +24,6 @@ generate:
 
 clean:
 	rm -f $(BROKER_APP_NAME) $(TRADER_APP_NAME)
+
+lint:
+	$$(go env GOPATH)/bin/golangci-lint run ./...

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/alpacahq/alpaca-trade-api-go/v3/alpaca"
 	"github.com/spf13/cobra"
@@ -18,8 +19,11 @@ var ordersListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List orders",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := getClient()
-		
+		client, err := getClient()
+		if err != nil {
+			return err
+		}
+
 		status := "open"
 		req := alpaca.GetOrdersRequest{
 			Status: status,
@@ -49,7 +53,8 @@ var ordersCreateCmd = &cobra.Command{
 			return fmt.Errorf("--file flag is required")
 		}
 
-		data, err := os.ReadFile(orderPayloadFile)
+		cleanFile := filepath.Clean(orderPayloadFile)
+		data, err := os.ReadFile(cleanFile)
 		if err != nil {
 			return fmt.Errorf("failed to read payload file: %w", err)
 		}
@@ -59,8 +64,11 @@ var ordersCreateCmd = &cobra.Command{
 			return fmt.Errorf("failed to parse JSON payload: %w", err)
 		}
 
-		client := getClient()
-		
+		client, err := getClient()
+		if err != nil {
+			return err
+		}
+
 		order, err := client.PlaceOrder(reqBody)
 		if err != nil {
 			return fmt.Errorf("failed to place order: %w", err)
@@ -80,6 +88,6 @@ func init() {
 	ordersCmd.AddCommand(ordersListCmd)
 
 	ordersCreateCmd.Flags().StringVarP(&orderPayloadFile, "file", "f", "", "Path to the JSON payload file")
-	ordersCreateCmd.MarkFlagRequired("file")
+	ordersCreateCmd.MarkFlagRequired("file") //nolint:errcheck
 	ordersCmd.AddCommand(ordersCreateCmd)
 }

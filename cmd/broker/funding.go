@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/google/uuid"
+	client "github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
 	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient/api"
-	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +35,8 @@ var fundingTransfersCmd = &cobra.Command{
 			return err
 		}
 
-		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		params := &client.GetTransfersParams{}
 		resp, err := c.GetTransfersWithResponse(ctx, parsedUUID, params)
 		if err != nil {
@@ -71,7 +73,7 @@ var fundingTransferCreateCmd = &cobra.Command{
 			return fmt.Errorf("--file flag is required")
 		}
 
-		data, err := os.ReadFile(transferPayloadFile)
+		data, err := os.ReadFile(transferPayloadFile) //nolint:gosec
 		if err != nil {
 			return fmt.Errorf("failed to read payload file: %w", err)
 		}
@@ -86,7 +88,8 @@ var fundingTransferCreateCmd = &cobra.Command{
 			return err
 		}
 
-		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		resp, err := c.PostTransfersWithResponse(ctx, parsedUUID, reqBody)
 		if err != nil {
 			return fmt.Errorf("failed to create transfer: %w", err)
@@ -110,6 +113,6 @@ func init() {
 	fundingCmd.AddCommand(fundingTransfersCmd)
 
 	fundingTransferCreateCmd.Flags().StringVarP(&transferPayloadFile, "file", "f", "", "Path to the JSON payload file")
-	fundingTransferCreateCmd.MarkFlagRequired("file")
+	fundingTransferCreateCmd.MarkFlagRequired("file") //nolint:errcheck
 	fundingCmd.AddCommand(fundingTransferCreateCmd)
 }

@@ -16,7 +16,10 @@ var positionsListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List open positions",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := getClient()
+		client, err := getClient()
+		if err != nil {
+			return err
+		}
 
 		positions, err := client.GetPositions()
 		if err != nil {

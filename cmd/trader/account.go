@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/alpacahq/alpaca-trade-api-go/v3/alpaca"
 	"github.com/spf13/cobra"
@@ -11,13 +10,13 @@ import (
 )
 
 // getClient instantiates the Alpaca Trading API client.
-func getClient() *alpaca.Client {
+func getClient() (*alpaca.Client, error) {
 	apiKey := viper.GetString("api-key")
 	apiSecret := viper.GetString("api-secret")
 	env := viper.GetString("env")
 
 	if apiKey == "" || apiSecret == "" {
-		log.Fatal("Missing APCA_API_KEY_ID or APCA_API_SECRET_KEY")
+		return nil, fmt.Errorf("Missing APCA_API_KEY_ID or APCA_API_SECRET_KEY")
 	}
 
 	baseURL := "https://paper-api.alpaca.markets"
@@ -29,7 +28,7 @@ func getClient() *alpaca.Client {
 		APIKey:    apiKey,
 		APISecret: apiSecret,
 		BaseURL:   baseURL,
-	})
+	}), nil
 }
 
 var accountCmd = &cobra.Command{
@@ -41,7 +40,10 @@ var accountGetCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Get account details",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := getClient()
+		client, err := getClient()
+		if err != nil {
+			return err
+		}
 		acct, err := client.GetAccount()
 		if err != nil {
 			return fmt.Errorf("failed to get account: %w", err)
