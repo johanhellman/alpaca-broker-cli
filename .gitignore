@@ -1,0 +1,14 @@
+# Binaries
+alpaca-broker
+alpaca-trader
+alpaca-cli
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Configs
+.env
+*.yaml
+*.json
