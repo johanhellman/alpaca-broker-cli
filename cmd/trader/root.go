@@ -10,7 +10,7 @@ import (
 
 var cfgFile string
 
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:   "alpaca-trader",
 	Short: "A CLI tool for the Alpaca Trading API",
 	Long: `alpaca-trader is a powerful command-line interface for interacting
@@ -24,7 +24,7 @@ Set APCA_API_KEY_ID and APCA_API_SECRET_KEY in your environment to authenticate.
 }
 
 func Execute() {
-	err := rootCmd.Execute()
+	err := RootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
@@ -33,16 +33,16 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.alpaca-trader.yaml)")
-	rootCmd.PersistentFlags().String("api-key", "", "Alpaca Trading API Key ID")
-	rootCmd.PersistentFlags().String("api-secret", "", "Alpaca Trading API Secret Key")
-	rootCmd.PersistentFlags().String("env", "paper", "Alpaca environment (paper or live)")
-	rootCmd.PersistentFlags().String("output", "table", "Output format (table or json)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.alpaca-trader.yaml)")
+	RootCmd.PersistentFlags().String("api-key", "", "Alpaca Trading API Key ID")
+	RootCmd.PersistentFlags().String("api-secret", "", "Alpaca Trading API Secret Key")
+	RootCmd.PersistentFlags().String("env", "paper", "Alpaca environment (paper or live)")
+	RootCmd.PersistentFlags().String("output", "table", "Output format (table or json)")
 
-	viper.BindPFlag("api-key", rootCmd.PersistentFlags().Lookup("api-key"))
-	viper.BindPFlag("api-secret", rootCmd.PersistentFlags().Lookup("api-secret"))
-	viper.BindPFlag("env", rootCmd.PersistentFlags().Lookup("env"))
-	viper.BindPFlag("output", rootCmd.PersistentFlags().Lookup("output"))
+	viper.BindPFlag("api-key", RootCmd.PersistentFlags().Lookup("api-key"))
+	viper.BindPFlag("api-secret", RootCmd.PersistentFlags().Lookup("api-secret"))
+	viper.BindPFlag("env", RootCmd.PersistentFlags().Lookup("env"))
+	viper.BindPFlag("output", RootCmd.PersistentFlags().Lookup("output"))
 }
 
 func initConfig() {

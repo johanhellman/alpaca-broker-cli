@@ -76,7 +76,7 @@ var ordersCreateCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(ordersCmd)
+	RootCmd.AddCommand(ordersCmd)
 	ordersCmd.AddCommand(ordersListCmd)
 
 	ordersCreateCmd.Flags().StringVarP(&orderPayloadFile, "file", "f", "", "Path to the JSON payload file")

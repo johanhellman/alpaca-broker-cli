@@ -33,6 +33,6 @@ var positionsListCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(positionsCmd)
+	RootCmd.AddCommand(positionsCmd)
 	positionsCmd.AddCommand(positionsListCmd)
 }
