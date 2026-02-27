@@ -2,7 +2,7 @@
 
 This document outlines the planned iterations to evolve the `alpaca-cli` project (which contains the `alpaca-broker` and `alpaca-trader` binaries) from its current MVP state into a fully-fledged, production-ready suite of CLI tools.
 
-## Iteration 0: Foundation & Technical Quality (Immediate Focus)
+## Iteration 0: Foundation & Technical Quality (**Completed**)
 Before iterating on features, the underlying codebase needs to be brought up to standard best practices for modern Go applications.
 - **CI/CD & Linting**: Introduce `.github/workflows/ci.yml` to run `go test`, `go build`, and `golangci-lint` on PRs. Add a `.golangci.yaml` configuration with robust checks (`errcheck`, `gosec`, `gocyclo`, `revive`, `gofmt`) and a `make lint` target.
 - **Error Handling & Architecture**: Replace bare `log.Fatal` calls (which break testability and cause unexpected crashes) with structured error returns. Implement proper Cobra error handling and introduce API timeouts in contexts (replacing `context.Background()`).
@@ -10,7 +10,7 @@ Before iterating on features, the underlying codebase needs to be brought up to 
 - **Hygiene**: Bump outdated dependencies (e.g., Viper, Validator, gRPC) to latest secure versions.
 - **Outcome**: A stable, tested, and automatically validated repository ready for feature additions.
 
-## Iteration 1: Parameterization and Filtering (Next Up)
+## Iteration 1: Parameterization and Filtering (**Immediate Focus**)
 The current MVP commands rely heavily on raw JSON files (`--file payload.json`) for complex mutations and lack filtering options for lists.
 - **Goal**: Add robust, native command-line flags.
 - **Trader Example**: `alpaca-trader orders create --symbol AAPL --qty 1 --side buy --type market --time-in-force day`

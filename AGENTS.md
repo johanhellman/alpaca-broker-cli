@@ -22,9 +22,14 @@ This repository contains **two distinct CLI executables** built in Go using the 
 ## 🛠 Important Workflows
 - **Docs Generation**: We auto-generate markdown documentation for both CLI command trees inside the `docs/` folder using Cobra. If you add or modify commands, you **must** update the docs by running:
   ```bash
-  go run tools/gendocs.go && go run tools/gendocs_trader.go
+  go run tools/broker/gendocs.go && go run tools/trader/gendocs_trader.go
   ```
 - **Broker API Re-generation**: If the `api/openapi.yaml` file is updated with a newer version from Alpaca, run `make generate` to natively recreate the Go client in `pkg/brokerclient/`.
+- **CI Synchronization**: The local `make ci` target must always be kept in sync with the jobs defined in `.github/workflows/ci.yml`. Run `make ci` locally to validate code before pushing.
+- **Pushing and Validating**: After executing `git push`, you **must** use the GitHub CLI to monitor the CI pipeline and ensure it succeeds before moving on:
+  ```bash
+  gh run watch
+  ```
 
 ## ✅ Coding Standards
 - Do not introduce new third-party CLI or Configuration frameworks; rigorously stick to `cobra` and `viper`.
