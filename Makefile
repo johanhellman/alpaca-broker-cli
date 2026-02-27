@@ -12,8 +12,9 @@ build-trader:
 	go build -o $(TRADER_APP_NAME) cmd/trader/main/main.go
 
 install: build
-	go install ./cmd/broker/main
-	go install ./cmd/trader/main
+	@mkdir -p $$(go env GOPATH)/bin
+	cp $(BROKER_APP_NAME) $$(go env GOPATH)/bin/
+	cp $(TRADER_APP_NAME) $$(go env GOPATH)/bin/
 
 test:
 	go test ./...
