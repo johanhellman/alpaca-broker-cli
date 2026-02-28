@@ -20,14 +20,14 @@ The current MVP commands rely heavily on raw JSON files (`--file payload.json`) 
 ## Iteration 2: Feature Completeness (Breadth) (**Completed**)
 Expand the command surface area to cover the entirety of both Alpaca API specifications.
 - **Trader API Additions**: 
-  - Assets (`alpaca-trader assets`)
-  - Watchlists (`alpaca-trader watchlists`)
-  - Corporate Actions
-  - Market Data (fetching historical bars/quotes natively in the terminal)
+  - [x] Assets (`alpaca-trader assets`)
+  - [x] Watchlists (`alpaca-trader watchlists`)
+  - [x] Corporate Actions
+  - [x] Market Data (fetching historical bars/quotes natively in the terminal)
 - **Broker API Additions**: 
-  - Journals (moving money between sub-accounts and the firm)
-  - Documents (uploading KYC / W-8BENs)
-  - Events (SSE streaming of account status changes directly to `stdout`)
+  - [x] Journals (moving money between sub-accounts and the firm)
+  - [x] Documents (uploading KYC / W-8BENs)
+  - [x] Events (SSE streaming of account status changes directly to `stdout`)
 - **Outcome**: The CLI tools become a true 1:1 functional reflection of the Alpaca API Reference.
 
 ## Iteration 3: Complex Output & Data Extraction (UX Polish) (**Immediate Focus**)
