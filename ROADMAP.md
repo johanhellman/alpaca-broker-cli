@@ -45,20 +45,20 @@ To be production-ready and easily adopted by other developers or traders, the pr
 - [x] **Feature**: Provide pre-compiled `.tar.gz` and `.zip` releases on the GitHub Releases page.
 - **Outcome**: Zero-friction installation for non-Go developers.
 
-## Iteration 5: Multi-Environment & Secure Credential Management (**Planned**)
-As users scale, they will likely manage multiple accounts (e.g., Paper vs Live, or multiple Broker sub-environments).
-- **Goal**: Introduce a `kubectl`-style context manager and secure API keys.
-- **Feature**: `alpaca-trader config use-context live` and `alpaca-trader config use-context paper` to switch environments on the fly without changing environment variables.
-- **Feature**: Integrate native OS Keychain/Keystore backing so API Secrets are not stored in plaintext inside `~/.alpaca-trader.yaml`.
-
-## Iteration 6: Advanced TUI & Live Streaming (**Planned**)
-A strictly command-and-response CLI can feel static for financial tools.
-- **Goal**: Implement high-fidelity Terminal User Interfaces (TUI) and real-time streaming displays.
-- **Feature**: Use [Bubble Tea](https://github.com/charmbracelet/bubbletea) to build a split-pane dashboard (`alpaca-trader dashboard`) showing live portfolio PnL, active orders, and real-time market data quotes.
-- **Feature**: Enhance the `events` streams to use dynamic terminal spinners and colors that update in-place as trade events pour in.
-
-## Iteration 7: Data Export & Offline Analytics (**Planned**)
-Traders and brokers need to reconcile data offline for accounting, taxes, or strategy backtesting.
+## Iteration 5: Data Export & Offline Analytics (**Planned**)
+Traders and brokers need to reconcile data offline for accounting, taxes, or strategy backtesting. This is a natural extension of the tabular output features introduced in Iteration 3.
 - **Goal**: Make the CLI a first-class data ingestion tool.
 - **Feature**: Support `--format csv` across all list endpoints (Orders, Journals, Accounts, Market Data).
 - **Feature**: Generate PDF or Markdown summary tear-sheets for account performance over a given `--timeframe`.
+
+## Iteration 6: Multi-Environment & Secure Credential Management (**Planned**)
+As users scale, they will likely manage multiple accounts (e.g., Paper vs Live, or multiple Broker sub-environments). Environment variables will always remain supported as the fundamental configuration layer, but power users need faster context switching.
+- **Goal**: Introduce an optional `kubectl`-style context manager and secure API keys.
+- **Feature**: `alpaca-trader config use-context live` and `alpaca-trader config use-context paper` to switch environments on the fly without changing environment variables (environment variables will still act as overrides).
+- **Feature**: Integrate native OS Keychain/Keystore backing so API Secrets don't have to be stored in plaintext inside `~/.alpaca-trader.yaml`.
+
+## Iteration 7: Advanced TUI & Live Streaming (**Planned**)
+A strictly command-and-response CLI can feel static for financial tools.
+- **Goal**: Implement high-fidelity Terminal User Interfaces (TUI) and real-time streaming displays.
+- **Feature**: Use [Bubble Tea](https://github.com/charmbracelet/bubbletea) to build a split-pane dashboard (`alpaca-trader dashboard`) showing live portfolio PnL, active orders, and real-time market data quotes. This functions purely as a specialized sub-command within the CLI, exactly like `htop`, `lazygit`, or `k9s`.
+- **Feature**: Enhance the `events` streams to use dynamic terminal spinners and colors that update in-place as trade events pour in.
