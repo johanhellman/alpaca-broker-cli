@@ -37,10 +37,10 @@ Standard API responses can be inherently noisy for terminal utilities. The CLI n
 - [x] **Feature**: Auto-follow pagination links/tokens for `list` endpoints via an `--all` flag.
 - **Outcome**: The CLI becomes a powerful data plumbing tool for backend shell scripts and automations.
 
-## Iteration 4: CI/CD & Distribution (**Immediate Focus**)
+## Iteration 4: CI/CD & Distribution (**Completed**)
 To be production-ready and easily adopted by other developers or traders, the project must be easily distributable rather than relying strictly on the Go development toolchain (`go install`).
 - **Goal**: Automated binary builds and native package manager distribution.
-- **Feature**: Introduce [GoReleaser](https://goreleaser.com/) to build binaries for macOS, Linux, and Windows automatically via GitHub Actions pipelines.
-- **Feature**: Create a Homebrew Tap (e.g., `brew install johanhellman/tap/alpaca-cli`).
-- **Feature**: Provide pre-compiled `.tar.gz` and `.zip` releases on the GitHub Releases page.
+- [x] **Feature**: Introduce [GoReleaser](https://goreleaser.com/) to build binaries for macOS, Linux, and Windows automatically via GitHub Actions pipelines.
+- [x] **Feature**: Create a Homebrew Tap (e.g., `brew install johanhellman/tap/alpaca-cli`).
+- [x] **Feature**: Provide pre-compiled `.tar.gz` and `.zip` releases on the GitHub Releases page.
 - **Outcome**: Zero-friction installation for non-Go developers.
