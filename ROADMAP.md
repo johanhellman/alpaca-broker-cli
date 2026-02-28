@@ -30,14 +30,14 @@ Expand the command surface area to cover the entirety of both Alpaca API specifi
   - [x] Events (SSE streaming of account status changes directly to `stdout`)
 - **Outcome**: The CLI tools become a true 1:1 functional reflection of the Alpaca API Reference.
 
-## Iteration 3: Complex Output & Data Extraction (UX Polish) (**Immediate Focus**)
+## Iteration 3: Complex Output & Data Extraction (UX Polish) (**Completed**)
 Standard API responses can be inherently noisy for terminal utilities. The CLI needs filtering and robust output handling capabilities.
 - **Goal**: Implement `jq`-like filtering or wide/narrow table outputs. Automate pagination handling.
-- **Feature**: Provide a `--format json` mode and add a global `--query "portfolio_value"` flag (using a fast JSON processor like `gjson`).
-- **Feature**: Auto-follow pagination links/tokens for `list` endpoints via an `--all` flag.
+- [x] **Feature**: Provide a `--format json` mode and add a global `--query "portfolio_value"` flag (using a fast JSON processor like `gjson`).
+- [x] **Feature**: Auto-follow pagination links/tokens for `list` endpoints via an `--all` flag.
 - **Outcome**: The CLI becomes a powerful data plumbing tool for backend shell scripts and automations.
 
-## Iteration 4: CI/CD & Distribution
+## Iteration 4: CI/CD & Distribution (**Immediate Focus**)
 To be production-ready and easily adopted by other developers or traders, the project must be easily distributable rather than relying strictly on the Go development toolchain (`go install`).
 - **Goal**: Automated binary builds and native package manager distribution.
 - **Feature**: Introduce [GoReleaser](https://goreleaser.com/) to build binaries for macOS, Linux, and Windows automatically via GitHub Actions pipelines.

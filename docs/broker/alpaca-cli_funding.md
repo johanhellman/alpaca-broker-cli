@@ -15,11 +15,13 @@ List and create ACH relationships and bank transfers for an account.
 ### Options inherited from parent commands
 
 ```
+      --all                 Automatically fetch all pages for list endpoints
       --api-key string      Alpaca Broker API Key
       --api-secret string   Alpaca Broker API Secret
       --config string       config file (default is $HOME/.alpaca-cli.yaml)
       --env string          Alpaca environment (sandbox or production) (default "sandbox")
       --output string       Output format (table or json) (default "table")
+      --query string        Filter output using jq-like syntax (forces json output if used)
 ```
 
 ### SEE ALSO

@@ -15,11 +15,13 @@ alpaca-trader positions get <symbol> [flags]
 ### Options inherited from parent commands
 
 ```
+      --all                 Automatically fetch all pages for list endpoints
       --api-key string      Alpaca API Key ID
       --api-secret string   Alpaca API Secret Key
       --config string       config file (default is $HOME/.alpaca-trader.yaml)
       --env string          Alpaca environment (paper or live) (default "paper")
       --output string       Output format (table or json) (default "table")
+      --query string        Filter output using jq-like syntax (forces json output if used)
 ```
 
 ### SEE ALSO

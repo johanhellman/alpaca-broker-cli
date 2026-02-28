@@ -16,6 +16,7 @@ alpaca-cli accounts list [flags]
 ### Options inherited from parent commands
 
 ```
+      --all                 Automatically fetch all pages for list endpoints
       --api-key string      Alpaca Broker API Key
       --api-secret string   Alpaca Broker API Secret
       --config string       config file (default is $HOME/.alpaca-cli.yaml)
