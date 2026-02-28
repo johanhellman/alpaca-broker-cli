@@ -104,7 +104,7 @@ func streamEvents(eventType string) error {
 		if err != nil {
 			return fmt.Errorf("failed to connect to stream: %w", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }() //nolint:errcheck
 		_, err = io.Copy(os.Stdout, resp.Body)
 		return err
 
@@ -119,7 +119,7 @@ func streamEvents(eventType string) error {
 		if err != nil {
 			return fmt.Errorf("failed to connect to stream: %w", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }() //nolint:errcheck
 		_, err = io.Copy(os.Stdout, resp.Body)
 		return err
 
@@ -134,7 +134,7 @@ func streamEvents(eventType string) error {
 		if err != nil {
 			return fmt.Errorf("failed to connect to stream: %w", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }() //nolint:errcheck
 		_, err = io.Copy(os.Stdout, resp.Body)
 		return err
 

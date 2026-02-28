@@ -33,6 +33,7 @@ docs:
 clean:
 	rm -f $(BROKER_APP_NAME) $(TRADER_APP_NAME)
 
+lint:
 	$$(go env GOPATH)/bin/golangci-lint run ./...
 
 ci: lint coverage test

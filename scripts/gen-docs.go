@@ -12,7 +12,7 @@ import (
 func main() {
 	// Generate Broker API Markdown Paths
 	brokerDir := "./docs/broker"
-	if err := os.MkdirAll(brokerDir, 0755); err != nil {
+	if err := os.MkdirAll(brokerDir, 0750); err != nil {
 		log.Fatalf("failed to create broker docs directory: %v", err)
 	}
 
@@ -26,7 +26,7 @@ func main() {
 
 	// Generate Trader API Markdown Paths
 	traderDir := "./docs/trader"
-	if err := os.MkdirAll(traderDir, 0755); err != nil {
+	if err := os.MkdirAll(traderDir, 0750); err != nil {
 		log.Fatalf("failed to create trader docs directory: %v", err)
 	}
 

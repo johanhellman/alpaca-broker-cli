@@ -59,7 +59,7 @@ func TestPrintOutput_Query(t *testing.T) {
 	err = printOutput(testData)
 	assert.NoError(t, err)
 
-	w.Close()
+	assert.NoError(t, w.Close())
 	os.Stdout = oldStdout
 
 	var buf bytes.Buffer
@@ -82,13 +82,14 @@ func TestPrintOutput_CSV(t *testing.T) {
 	}
 
 	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
+	r, w, err := os.Pipe()
+	assert.NoError(t, err)
 	os.Stdout = w
 
-	err := printOutput(testData)
+	err = printOutput(testData)
 	assert.NoError(t, err)
 
-	w.Close()
+	assert.NoError(t, w.Close())
 	os.Stdout = oldStdout
 
 	var buf bytes.Buffer

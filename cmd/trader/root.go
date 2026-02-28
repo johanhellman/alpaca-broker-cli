@@ -140,9 +140,9 @@ func printTable(data interface{}) error {
 
 	if firstElement.Kind() == reflect.Struct {
 		for i := 0; i < firstElement.NumField(); i++ {
-			_, _ = fmt.Fprintf(w, "%v\t", firstElement.Type().Field(i).Name)
+			_, _ = fmt.Fprintf(w, "%v\t", firstElement.Type().Field(i).Name) //nolint:errcheck
 		}
-		_, _ = fmt.Fprintln(w)
+		_, _ = fmt.Fprintln(w) //nolint:errcheck
 	}
 
 	for i := 0; i < val.Len(); i++ {
@@ -150,11 +150,11 @@ func printTable(data interface{}) error {
 		if element.Kind() == reflect.Struct {
 			for j := 0; j < element.NumField(); j++ {
 				field := element.Field(j)
-				_, _ = fmt.Fprintf(w, "%v\t", field.Interface())
+				_, _ = fmt.Fprintf(w, "%v\t", field.Interface()) //nolint:errcheck
 			}
-			_, _ = fmt.Fprintln(w)
+			_, _ = fmt.Fprintln(w) //nolint:errcheck
 		} else {
-			_, _ = fmt.Fprintln(w, element.Interface())
+			_, _ = fmt.Fprintln(w, element.Interface()) //nolint:errcheck
 		}
 	}
 	return w.Flush()
