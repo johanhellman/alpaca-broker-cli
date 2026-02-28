@@ -17,7 +17,7 @@ The current MVP commands rely heavily on raw JSON files (`--file payload.json`) 
 - **Broker Example**: `alpaca-broker accounts list --status ACTIVE --limit 50`
 - **Outcome**: Users rarely need to hand-write JSON or parse through excessive results to perform standard daily operations.
 
-## Iteration 2: Feature Completeness (Breadth) (**Immediate Focus**)
+## Iteration 2: Feature Completeness (Breadth) (**Completed**)
 Expand the command surface area to cover the entirety of both Alpaca API specifications.
 - **Trader API Additions**: 
   - Assets (`alpaca-trader assets`)
@@ -30,7 +30,7 @@ Expand the command surface area to cover the entirety of both Alpaca API specifi
   - Events (SSE streaming of account status changes directly to `stdout`)
 - **Outcome**: The CLI tools become a true 1:1 functional reflection of the Alpaca API Reference.
 
-## Iteration 3: Complex Output & Data Extraction (UX Polish)
+## Iteration 3: Complex Output & Data Extraction (UX Polish) (**Immediate Focus**)
 Standard API responses can be inherently noisy for terminal utilities. The CLI needs filtering and robust output handling capabilities.
 - **Goal**: Implement `jq`-like filtering or wide/narrow table outputs. Automate pagination handling.
 - **Feature**: Provide a `--format json` mode and add a global `--query "portfolio_value"` flag (using a fast JSON processor like `gjson`).
