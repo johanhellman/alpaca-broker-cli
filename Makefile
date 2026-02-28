@@ -1,4 +1,4 @@
-.PHONY: build build-broker build-trader install test generate clean lint ci
+.PHONY: build build-broker build-trader install test generate docs clean lint ci
 
 BROKER_APP_NAME = alpaca-broker
 TRADER_APP_NAME = alpaca-trader
@@ -26,6 +26,9 @@ coverage:
 
 generate:
 	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest -generate types,client -package brokerclient api/openapi.yaml > pkg/brokerclient/client.gen.go
+
+docs:
+	go run scripts/gen-docs.go
 
 clean:
 	rm -f $(BROKER_APP_NAME) $(TRADER_APP_NAME)

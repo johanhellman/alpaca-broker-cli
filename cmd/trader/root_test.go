@@ -52,17 +52,19 @@ func TestPrintOutput_Query(t *testing.T) {
 
 	// Capture stdout
 	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
+	r, w, err := os.Pipe()
+	assert.NoError(t, err)
 	os.Stdout = w
 
-	err := printOutput(testData)
+	err = printOutput(testData)
 	assert.NoError(t, err)
 
 	w.Close()
 	os.Stdout = oldStdout
 
 	var buf bytes.Buffer
-	_, _ = buf.ReadFrom(r)
+	_, err = buf.ReadFrom(r)
+	assert.NoError(t, err)
 	assert.Contains(t, buf.String(), "12345")
 }
 
@@ -90,8 +92,9 @@ func TestPrintOutput_CSV(t *testing.T) {
 	os.Stdout = oldStdout
 
 	var buf bytes.Buffer
-	_, _ = buf.ReadFrom(r)
-	
+	_, err = buf.ReadFrom(r)
+	assert.NoError(t, err)
+
 	output := buf.String()
 	// Assert headers
 	assert.Contains(t, output, "ID,Amount")

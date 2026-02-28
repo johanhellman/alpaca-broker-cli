@@ -15,13 +15,13 @@ import (
 )
 
 var (
-	docUploadFile        string
-	docUploadType        string
-	docUploadMimeType    string
-	docUploadSubType     string
+	docUploadFile     string
+	docUploadType     string
+	docUploadMimeType string
+	docUploadSubType  string
 
-	docListStartDate     string
-	docListEndDate       string
+	docListStartDate string
+	docListEndDate   string
 )
 
 var documentsCmd = &cobra.Command{

@@ -25,7 +25,7 @@ func TestOrdersCmd_TraderFlags(t *testing.T) {
 	RootCmd.SetOut(b)
 	RootCmd.SetArgs([]string{"orders", "create"})
 	err := RootCmd.Execute()
-	
+
 	// Should fail because --symbol, --side, etc. are missing
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "required flag")

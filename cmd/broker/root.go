@@ -105,102 +105,16 @@ func printOutput(data interface{}) error {
 	outputFormat := viper.GetString("output")
 	query := viper.GetString("query")
 
-	// If query is present, we force JSON marshaling and utilize gjson
 	if query != "" {
-		out, err := json.Marshal(data)
-		if err != nil {
-			return err
-		}
-		result := gjson.GetBytes(out, query)
-
-		// If the query pulls a single string (like "0.id") don't wrap it in JSON quotes for bash parsing
-		if result.Type == gjson.String {
-			fmt.Println(result.String())
-		} else {
-			fmt.Println(result.Raw)
-		}
-		return nil
+		return printQuery(data, query)
 	}
 
 	if outputFormat == "table" {
-		val := reflect.Indirect(reflect.ValueOf(data))
-		if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
-			slice := reflect.MakeSlice(reflect.SliceOf(val.Type()), 0, 1)
-			val = reflect.Append(slice, val)
-		}
-
-		if val.Len() == 0 {
-			fmt.Println("No data found.")
-			return nil
-		}
-
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-		firstElement := reflect.Indirect(val.Index(0))
-
-		if firstElement.Kind() == reflect.Struct {
-			for i := 0; i < firstElement.NumField(); i++ {
-				fmt.Fprintf(w, "%-20v\t", firstElement.Type().Field(i).Name)
-			}
-			fmt.Fprintln(w)
-		}
-
-		for i := 0; i < val.Len(); i++ {
-			element := reflect.Indirect(val.Index(i))
-			if element.Kind() == reflect.Struct {
-				for j := 0; j < element.NumField(); j++ {
-					field := element.Field(j)
-					fmt.Fprintf(w, "%-20v\t", field.Interface())
-				}
-				fmt.Fprintln(w)
-			} else {
-				fmt.Fprintln(w, element.Interface())
-			}
-		}
-		return w.Flush()
+		return printTable(data)
 	}
 
 	if outputFormat == "csv" {
-		val := reflect.Indirect(reflect.ValueOf(data))
-		if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
-			slice := reflect.MakeSlice(reflect.SliceOf(val.Type()), 0, 1)
-			val = reflect.Append(slice, val)
-		}
-
-		cw := csv.NewWriter(os.Stdout)
-		if val.Len() == 0 {
-			// Empty dataset yields no CSV output
-			return nil
-		}
-
-		firstElement := reflect.Indirect(val.Index(0))
-
-		if firstElement.Kind() == reflect.Struct {
-			var headers []string
-			for i := 0; i < firstElement.NumField(); i++ {
-				headers = append(headers, firstElement.Type().Field(i).Name)
-			}
-			if err := cw.Write(headers); err != nil {
-				return err
-			}
-		}
-
-		for i := 0; i < val.Len(); i++ {
-			element := reflect.Indirect(val.Index(i))
-			var record []string
-			if element.Kind() == reflect.Struct {
-				for j := 0; j < element.NumField(); j++ {
-					field := element.Field(j)
-					record = append(record, fmt.Sprintf("%v", field.Interface()))
-				}
-			} else {
-				record = append(record, fmt.Sprintf("%v", element.Interface()))
-			}
-			if err := cw.Write(record); err != nil {
-				return err
-			}
-		}
-		cw.Flush()
-		return cw.Error()
+		return printCSV(data)
 	}
 
 	out, err := json.MarshalIndent(data, "", "  ")
@@ -209,4 +123,99 @@ func printOutput(data interface{}) error {
 	}
 	fmt.Println(string(out))
 	return nil
+}
+
+func printQuery(data interface{}, query string) error {
+	out, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	result := gjson.GetBytes(out, query)
+
+	if result.Type == gjson.String {
+		fmt.Println(result.String())
+	} else {
+		fmt.Println(result.Raw)
+	}
+	return nil
+}
+
+func printTable(data interface{}) error {
+	val := reflect.Indirect(reflect.ValueOf(data))
+	if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
+		slice := reflect.MakeSlice(reflect.SliceOf(val.Type()), 0, 1)
+		val = reflect.Append(slice, val)
+	}
+
+	if val.Len() == 0 {
+		fmt.Println("No data found.")
+		return nil
+	}
+
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
+	firstElement := reflect.Indirect(val.Index(0))
+
+	if firstElement.Kind() == reflect.Struct {
+		for i := 0; i < firstElement.NumField(); i++ {
+			_, _ = fmt.Fprintf(w, "%-20v\t", firstElement.Type().Field(i).Name)
+		}
+		_, _ = fmt.Fprintln(w)
+	}
+
+	for i := 0; i < val.Len(); i++ {
+		element := reflect.Indirect(val.Index(i))
+		if element.Kind() == reflect.Struct {
+			for j := 0; j < element.NumField(); j++ {
+				field := element.Field(j)
+				_, _ = fmt.Fprintf(w, "%-20v\t", field.Interface())
+			}
+			_, _ = fmt.Fprintln(w)
+		} else {
+			_, _ = fmt.Fprintln(w, element.Interface())
+		}
+	}
+	return w.Flush()
+}
+
+func printCSV(data interface{}) error {
+	val := reflect.Indirect(reflect.ValueOf(data))
+	if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
+		slice := reflect.MakeSlice(reflect.SliceOf(val.Type()), 0, 1)
+		val = reflect.Append(slice, val)
+	}
+
+	cw := csv.NewWriter(os.Stdout)
+	if val.Len() == 0 {
+		return nil
+	}
+
+	firstElement := reflect.Indirect(val.Index(0))
+
+	if firstElement.Kind() == reflect.Struct {
+		var headers []string
+		for i := 0; i < firstElement.NumField(); i++ {
+			headers = append(headers, firstElement.Type().Field(i).Name)
+		}
+		if err := cw.Write(headers); err != nil {
+			return err
+		}
+	}
+
+	for i := 0; i < val.Len(); i++ {
+		element := reflect.Indirect(val.Index(i))
+		var record []string
+		if element.Kind() == reflect.Struct {
+			for j := 0; j < element.NumField(); j++ {
+				field := element.Field(j)
+				record = append(record, fmt.Sprintf("%v", field.Interface()))
+			}
+		} else {
+			record = append(record, fmt.Sprintf("%v", element.Interface()))
+		}
+		if err := cw.Write(record); err != nil {
+			return err
+		}
+	}
+	cw.Flush()
+	return cw.Error()
 }

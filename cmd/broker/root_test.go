@@ -69,7 +69,8 @@ func TestPrintOutput_BrokerQuery(t *testing.T) {
 	os.Stdout = oldStdout
 
 	var buf bytes.Buffer
-	_, _ = buf.ReadFrom(r)
+	_, err = buf.ReadFrom(r)
+	assert.NoError(t, err)
 	assert.Contains(t, buf.String(), "test@example.com")
 }
 
@@ -78,8 +79,8 @@ func TestPrintOutput_CSV(t *testing.T) {
 	viper.Set("output", "csv")
 
 	type MockAccount struct {
-		UUID     string
-		Status   string
+		UUID   string
+		Status string
 	}
 	testData := []MockAccount{
 		{UUID: "uuid-1", Status: "ACTIVE"},
@@ -98,7 +99,7 @@ func TestPrintOutput_CSV(t *testing.T) {
 
 	var buf bytes.Buffer
 	_, _ = buf.ReadFrom(r)
-	
+
 	output := buf.String()
 	// Assert CSV Headers
 	assert.Contains(t, output, "UUID,Status")

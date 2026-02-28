@@ -77,9 +77,8 @@ var accountsListCmd = &cobra.Command{
 			if !fetchAll || resp.JSON200 == nil || len(*resp.JSON200) < 100 {
 				break
 			}
-			
-			// Simple naive pagination since broker API uses different mechanisms internally
-			break
+
+			// Warning: Simple naive pagination logic used. Implement explicit NextPageToken for large broker accounts if needed.
 		}
 
 		return printOutput(allAccounts)

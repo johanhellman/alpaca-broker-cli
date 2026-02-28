@@ -115,4 +115,11 @@ export ALPACA_BROKER_API_SECRET="your_broker_sandbox_secret"
 
 ## Documentation
 
-Full command documentation for `alpaca-broker` can be found in the `docs/` folder (generated via `make generate`).
+Full command documentation for both CLI binaries can be found in the `docs/` folder:
+- `alpaca-broker` docs are located in `docs/broker/`
+- `alpaca-trader` docs are located in `docs/trader/`
+
+These files are auto-generated. If you add new commands or flags, update them by running:
+```bash
+make docs
+```
