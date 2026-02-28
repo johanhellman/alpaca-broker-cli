@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -71,4 +73,53 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+func printOutput(data interface{}) error {
+	format := viper.GetString("output")
+
+	switch format {
+	case "table":
+		// Simple table fallback. For lists, we should iterate. For single objects, print keys/values.
+		// A full robust table printer should be added in a future iteration, for now we do a simple KV or array print.
+		v := reflect.ValueOf(data)
+		if v.Kind() == reflect.Ptr {
+			v = v.Elem()
+		}
+
+		if v.Kind() == reflect.Slice || v.Kind() == reflect.Array {
+			fmt.Printf("Total Items: %d\n", v.Len())
+			for i := 0; i < v.Len(); i++ {
+				fmt.Printf("--- Item %d ---\n", i)
+				item := v.Index(i)
+				if item.Kind() == reflect.Ptr {
+					item = item.Elem()
+				}
+				if item.Kind() == reflect.Struct {
+					for j := 0; j < item.NumField(); j++ {
+						fmt.Printf("%s: %v\n", item.Type().Field(j).Name, item.Field(j).Interface())
+					}
+				} else {
+					fmt.Printf("%v\n", item.Interface())
+				}
+			}
+		} else if v.Kind() == reflect.Struct {
+			for i := 0; i < v.NumField(); i++ {
+				fmt.Printf("%s: %v\n", v.Type().Field(i).Name, v.Field(i).Interface())
+			}
+		} else {
+			fmt.Printf("%v\n", data)
+		}
+
+	case "json", "JSON":
+		fallthrough
+	default:
+		out, err := json.MarshalIndent(data, "", "  ")
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(out))
+	}
+
+	return nil
 }
