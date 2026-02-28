@@ -7,12 +7,13 @@ The Alpaca API provides immense power for trading and brokerage operations, but 
 
 The explicit instructions provided to the agent were to build a first-class, natively compiled command-line interface. The `gogcli` repository by `steipete` was supplied as the structural benchmark and inspiration for what the final product should look like.
 
-To accomplish this, AntiGravity was instructed to use **Go**, leveraging **Cobra** for the command router and **Viper** for configuration management. In addition, the agent was provided with the official Alpaca Markets public API documentation and links to public repositories, examples, and SDKs to use as the foundational ground truth.
+The only explicit technical constraint provided to the agent was to use **Go**. The choice to leverage **Cobra** for the command router and **Viper** for configuration management was made proactively by AntiGravity. In addition, the agent was provided with the official Alpaca Markets public API documentation and links to public repositories, examples, and SDKs to use as the foundational ground truth.
 
 ## 2. AI Collaboration & Technical Approach
-The path from those initial instructions to the mature product we have today was primarily driven by AI interacting in a dual-agent dynamic:
-- **AntiGravity (Main Driver):** Acted as the lead software engineer responsible for architecting the application, writing the code, mapping the Alpaca SDKs, and executing the roadmap.
-- **QA/Review Agent:** Functioned as an external code reviewer, periodically evaluating the repository against Go best practices to identify potential hygiene issues, security flaws, missing legal/community files, and CI/CD gaps.
+The path from those initial instructions to the mature product we have today was primarily driven by AI interacting in a multi-agent dynamic within AntiGravity:
+- **Agent A (Initial Setup):** Run once for the initial setup of the repository and analysis of requirements, including defining the initial MVP.
+- **Agent B (Main Implementer):** An ongoing session handling the continuous operational implementation, iterating on the initial MVP and writing out the CLI logic.
+- **Agent C (QA/Hygiene Agent):** An ongoing session functioning as an external code reviewer. Agent C was periodically asked to provide feedback to Agent B. Agent B was then asked to review and address the feedback provided by Agent C, evaluating the repository against Go best practices to identify potential hygiene issues, security flaws, missing legal/community files, and CI/CD gaps.
 
 The guiding principles for the architecture were:
 - **Separation of Concerns:** The Broker API and the Trading API are fundamentally different domains. They required dedicated CLI binaries rather than one monolith.
