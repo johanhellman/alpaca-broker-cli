@@ -89,6 +89,18 @@ alpaca-trader orders list
 alpaca-trader orders create --file order.json
 ```
 
+## E2E Testing (Sanity Checks)
+
+If you are a contributor working on the `alpaca-trader` binary, you can run the comprehensive End-to-End (E2E) verification script. This script automatically tests Accounts, Assets, Market Data, Watchlists, and complex Order permutations (Limit, Market, Fractional). 
+
+> **Important**: You **must** provide Alpaca Paper API credentials to run this script. The script aggressively enforces `APCA_ENV="paper"` to prevent accidental live-market mutations.
+
+```bash
+export APCA_API_KEY_ID="your_paper_key"
+export APCA_API_SECRET_KEY="your_paper_secret"
+./scripts/test-trader-e2e.sh
+```
+
 ## Documentation
 
 Full command documentation for `alpaca-broker` can be found in the `docs/` folder (generated via `make generate`).

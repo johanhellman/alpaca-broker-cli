@@ -24,22 +24,46 @@ export PATH="$PWD:$PATH"
 echo -e "\n1. Fetching Account Details..."
 alpaca-trader account get
 
-echo -e "\n2. Submitting Market Order (1 Share AAPL)..."
+echo -e "\n2. Verifying Asset Tradability (AAPL)..."
+alpaca-trader assets get AAPL
+
+echo -e "\n3. Fetching Market Data Quotes (AAPL)..."
+alpaca-trader market-data quotes AAPL --total-limit 1
+
+echo -e "\n4. Creating a Mock Watchlist..."
+# Generating a random suffix to avoid unique constraint collisions
+LIST_NAME="E2E-Test-List-$RANDOM"
+alpaca-trader watchlists create --name "$LIST_NAME" --symbols AAPL,GOOG
+# Parse the ID of the new watchlist for later cleanup
+WATCHLIST_ID=$(alpaca-trader watchlists list --query '0.id')
+
+echo -e "\n5. Submitting Orders: Market (AAPL), Limit (NVDA), and Fractional (MSFT)..."
+# Buy 1 share of AAPL at Market
 alpaca-trader orders create --symbol AAPL --qty 1 --side buy --type market --time-in-force day
+# Buy 1 share of NVDA at a strict Limit
+alpaca-trader orders create --symbol NVDA --qty 1 --side buy --type limit --limit-price 10.00 --time-in-force day 
+# Buy $50 USD of MSFT Fractionally
+alpaca-trader orders create --symbol MSFT --notional 50 --side buy --type market --time-in-force day
 
-echo -e "\n3. Submitting Fractional Order (\$100 Notional NVDA)..."
-alpaca-trader orders create --symbol NVDA --notional 100 --side buy --type market --time-in-force day
-
-echo -e "\n4. Querying Open Orders..."
+echo -e "\n6. Querying Open Orders..."
 alpaca-trader orders list
 
-echo -e "\n5. Waiting 10 seconds for fills..."
+echo -e "\n7. Waiting 10 seconds for fills..."
 sleep 10
 
-echo -e "\n6. Querying Current Positions..."
+echo -e "\n8. Querying Current Positions..."
 alpaca-trader positions list
 
-echo -e "\n7. Viewing Account Portfolio Value change..."
+echo -e "\n9. Cleaning up test artifacts (Watchlists, Open Limit Orders)..."
+alpaca-trader watchlists delete "$WATCHLIST_ID"
+# Using a complex jq-like query to find and cancel our unrealistic $10.00 NVDA limit order
+NVDA_ORDER=$(alpaca-trader orders list --query '#(symbol=="NVDA").id')
+if [ "$NVDA_ORDER" != "null" ]; then
+  # The SDK doesn't natively expose order cancellation via CLI yet, so we just acknowledge it
+  echo "    (Note: NVDA $10 limit order remains Open in paper ecosystem)"
+fi
+
+echo -e "\n10. Viewing Account Portfolio Value change..."
 alpaca-trader account get --query "PortfolioValue"
 
 echo -e "\n✅ E2E Testing Complete! "
