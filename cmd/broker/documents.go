@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	client "github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
-	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient/api"
+	client "github.com/johanhellman/alpaca-broker-cli/internal/brokerclient"
+	"github.com/johanhellman/alpaca-broker-cli/internal/brokerclient/api"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 	"github.com/spf13/cobra"
 )
