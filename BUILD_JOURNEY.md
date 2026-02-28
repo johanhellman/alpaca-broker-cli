@@ -5,7 +5,7 @@ This document outlines the journey of how the Alpaca CLI project (which encompas
 ## 1. The Inspiration
 The Alpaca API provides immense power for trading and brokerage operations, but interacting with REST APIs via raw `curl` commands or custom Python scripts can be cumbersome. The inspiration was to build a first-class, natively compiled command-line interface—similar to `kubectl` or `gh` (GitHub CLI)—that would allow developers and traders to orchestrate complex API interactions directly from their terminal with minimal friction.
 
-We chose **Go** as the language because of its rapid execution, excellent standard library, and ease of distributing single standalone binaries. We leveraged **Cobra** for the command router and **Viper** for configuration management, as they are the gold standards for modern Go CLI applications.
+We (specifically **AntiGravity**, an agentic AI coding assistant acting as the primary engineering driver) chose **Go** as the language because of its rapid execution, excellent standard library, and ease of distributing single standalone binaries. AntiGravity leveraged **Cobra** for the command router and **Viper** for configuration management, as they are the gold standards for modern Go CLI applications.
 
 ## 2. High-Level Instructions & Technical Approach
 The guiding principles for the architecture were:
@@ -18,35 +18,35 @@ The guiding principles for the architecture were:
 The MVP started as raw API wrappers. Initially, commands relied heavily on passing raw JSON files (e.g., `--file payload.json`) to invoke mutations (like creating an account or placing an order). 
 While functional, this proved to be poor UX. The MVP did, however, successfully validate the foundational routing and proved that the Alpaca OpenAPI specs could cleanly compile into native Go packages (which later matured into isolated `internal/` boundaries).
 
-With the core routing functional, we pivoted to a structured, iterative development approach.
+With the core routing functional, AntiGravity pivoted to a structured, iterative development approach.
 
 ## 4. Establishing the Roadmap
-To transition from a "working script" to a mature product, we defined a strict roadmap, executing features in focused, sequential Iterations:
+To transition from a "working script" to a mature product, AntiGravity defined a strict roadmap, executing features in focused, sequential Iterations:
 
 * **Iteration 0: Foundation & Technical Quality** 
-  We implemented strict CI/CD pipelines (`.github/workflows/ci.yml`), enforced `golangci-lint` (catching unchecked errors, cyclomatic complexity, and security flaws), and upgraded legacy dependencies. We replaced `log.Fatal` crashes with graceful Cobra error handling.
+  AntiGravity implemented strict CI/CD pipelines (`.github/workflows/ci.yml`), enforced `golangci-lint` (catching unchecked errors, cyclomatic complexity, and security flaws), and upgraded legacy dependencies. AntiGravity replaced `log.Fatal` crashes with graceful Cobra error handling.
 
 * **Iteration 1: Parameterization and Filtering**
-  We stripped away the reliance on raw JSON payloads. Commands were refactored to use native CLI flags (e.g., `alpaca-trader orders create --symbol AAPL --qty 1 --side buy`). This vastly improved the core user experience.
+  AntiGravity stripped away the reliance on raw JSON payloads. Commands were refactored to use native CLI flags (e.g., `alpaca-trader orders create --symbol AAPL --qty 1 --side buy`). This vastly improved the core user experience.
 
 * **Iteration 2: Feature Completeness**
-  We mapped out the rest of the Alpaca API surface area. For the Trader CLI, we introduced watchlists, corporate actions, and market data fetching. For the Broker CLI, we added journals (moving money internally), documents (KYC uploads), and real-time SSE event streaming. 
+  AntiGravity mapped out the rest of the Alpaca API surface area. For the Trader CLI, watchlists, corporate actions, and market data fetching were introduced. For the Broker CLI, journals (moving money internally), documents (KYC uploads), and real-time SSE event streaming were added. 
 
 * **Iteration 3: Complex Output & Data Extraction**
-  Standard API responses are noisy. We implemented a unified `printOutput` pipeline that allows users to seamlessly switch between human-readable tables (`--output table`), raw JSON (`--output json`), or extract specific JSON nodes on the fly using `--query` (powered by `gjson`).
+  Standard API responses are noisy. AntiGravity implemented a unified `printOutput` pipeline that allows users to seamlessly switch between human-readable tables (`--output table`), raw JSON (`--output json`), or extract specific JSON nodes on the fly using `--query` (powered by `gjson`).
 
 * **Iteration 4: CI/CD & Distribution**
-  To make the CLI accessible to non-Go developers, we integrated **GoReleaser**. The project now automatically cross-compiles production-ready binaries for macOS, Linux, and Windows, pushing them to GitHub Releases and publishing a Homebrew Tap.
+  To make the CLI accessible to non-Go developers, AntiGravity integrated **GoReleaser**. The project now automatically cross-compiles production-ready binaries for macOS, Linux, and Windows, pushing them to GitHub Releases and publishing a Homebrew Tap.
 
 * **Iteration 5: Data Export & Offline Analytics**
-  Traders need data offline for tax reconciliation and backtesting. We added native `--output csv` formatting globally. To ensure reliability, we built comprehensive bash-based E2E verification scripts (`scripts/test-broker-e2e.sh`, `scripts/test-trader-e2e.sh`) to integration-test the live API environments safely.
+  Traders need data offline for tax reconciliation and backtesting. AntiGravity added native `--output csv` formatting globally. To ensure reliability, AntiGravity built comprehensive bash-based E2E verification scripts (`scripts/test-broker-e2e.sh`, `scripts/test-trader-e2e.sh`) to integration-test the live API environments safely.
 
 ## 5. Reaching the Current Point: Security & Best Practices Audit
-Having completed Iteration 5, we paused feature development to conduct a rigorous external Repository Best Practices Audit. We implemented:
+Having completed Iteration 5, AntiGravity paused feature development to conduct a rigorous external Repository Best Practices Audit. AntiGravity implemented:
 - **Strict Module Isolation:** Shifted the generated SDK into an isolated `internal/brokerclient` architecture.
 - **Commercial Hygiene:** Added a proprietary `LICENSE`, configured Dependabot for weekly automation scans, and drafted inner-source `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` guidelines.
 - **Deep Linting Fixes:** Addressed remaining technical debt, including reducing cyclomatic complexity inside our output formatters and squelching all `errcheck` / `gosec` warnings.
 - **Auto-Generated Docs:** Wrote a Cobra Markdown generator (`scripts/gen-docs.go`) to automatically sync CLI help text to the `docs/` folder via `make docs`.
 
 ## Next Steps
-The repository currently sits at the precipice of **Iteration 6 (Multi-Environment & Secure Credential Management)**. The technical debt is zero, the CI pipeline is air-tight, the test scripts are mapped, and the project is fully commercially compliant. We are pausing here to gather external feedback before implementing the credential Keystore and context manager.
+The repository currently sits at the precipice of **Iteration 6 (Multi-Environment & Secure Credential Management)**. The technical debt is zero, the CI pipeline is air-tight, the test scripts are mapped, and the project is fully commercially compliant. AntiGravity is pausing here to gather external feedback before implementing the credential Keystore and context manager.
