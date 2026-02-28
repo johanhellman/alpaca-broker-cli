@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	client "github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
+	client "github.com/johanhellman/alpaca-broker-cli/internal/brokerclient"
 	"github.com/spf13/viper"
 )
 

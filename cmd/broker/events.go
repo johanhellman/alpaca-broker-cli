@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	client "github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient"
-	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient/api"
+	client "github.com/johanhellman/alpaca-broker-cli/internal/brokerclient"
+	"github.com/johanhellman/alpaca-broker-cli/internal/brokerclient/api"
 	"github.com/spf13/cobra"
 )
 

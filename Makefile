@@ -25,7 +25,7 @@ coverage:
 	go tool cover -func=coverage.out | grep total | awk '{print substr($$3, 1, length($$3)-1)}' | awk '{if ($$1 < 60) {print "Coverage is below 60%"; exit 1} else {print "Coverage is good"}}'
 
 generate:
-	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest -generate types,client -package brokerclient api/openapi.yaml > pkg/brokerclient/client.gen.go
+	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest -generate types,client -package brokerclient api/openapi.yaml > internal/brokerclient/client.gen.go
 
 docs:
 	go run scripts/gen-docs.go
