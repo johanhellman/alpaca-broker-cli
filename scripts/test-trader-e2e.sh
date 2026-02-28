@@ -66,5 +66,8 @@ fi
 echo -e "\n10. Viewing Account Portfolio Value change..."
 alpaca-trader account get --query "PortfolioValue"
 
+echo -e "\n11. Testing CSV Data Export (Positions)..."
+alpaca-trader positions list --output csv
+
 echo -e "\n✅ E2E Testing Complete! "
 echo "Note: 'positions close-all' is bypassed by default to prevent triggering Alpaca's Paper API Pattern-Day-Trader (PDT) wash-trade protections."

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -61,7 +62,7 @@ func init() {
 	rootCmd.PersistentFlags().String("env", "sandbox", "Alpaca environment (sandbox or production)")
 	_ = viper.BindPFlag("env", rootCmd.PersistentFlags().Lookup("env")) //nolint:errcheck
 
-	rootCmd.PersistentFlags().String("output", "table", "Output format (table or json)")
+	rootCmd.PersistentFlags().String("output", "table", "Output format (table, json, or csv)")
 	_ = viper.BindPFlag("output", rootCmd.PersistentFlags().Lookup("output")) //nolint:errcheck
 
 	rootCmd.PersistentFlags().String("query", "", "Filter output using jq-like syntax (forces json output if used)")
@@ -156,6 +157,50 @@ func printOutput(data interface{}) error {
 			}
 		}
 		return w.Flush()
+	}
+
+	if outputFormat == "csv" {
+		val := reflect.Indirect(reflect.ValueOf(data))
+		if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
+			slice := reflect.MakeSlice(reflect.SliceOf(val.Type()), 0, 1)
+			val = reflect.Append(slice, val)
+		}
+
+		cw := csv.NewWriter(os.Stdout)
+		if val.Len() == 0 {
+			// Empty dataset yields no CSV output
+			return nil
+		}
+
+		firstElement := reflect.Indirect(val.Index(0))
+
+		if firstElement.Kind() == reflect.Struct {
+			var headers []string
+			for i := 0; i < firstElement.NumField(); i++ {
+				headers = append(headers, firstElement.Type().Field(i).Name)
+			}
+			if err := cw.Write(headers); err != nil {
+				return err
+			}
+		}
+
+		for i := 0; i < val.Len(); i++ {
+			element := reflect.Indirect(val.Index(i))
+			var record []string
+			if element.Kind() == reflect.Struct {
+				for j := 0; j < element.NumField(); j++ {
+					field := element.Field(j)
+					record = append(record, fmt.Sprintf("%v", field.Interface()))
+				}
+			} else {
+				record = append(record, fmt.Sprintf("%v", element.Interface()))
+			}
+			if err := cw.Write(record); err != nil {
+				return err
+			}
+		}
+		cw.Flush()
+		return cw.Error()
 	}
 
 	out, err := json.MarshalIndent(data, "", "  ")

@@ -65,3 +65,37 @@ func TestPrintOutput_Query(t *testing.T) {
 	_, _ = buf.ReadFrom(r)
 	assert.Contains(t, buf.String(), "12345")
 }
+
+func TestPrintOutput_CSV(t *testing.T) {
+	viper.Reset()
+	viper.Set("output", "csv")
+
+	type MockTrade struct {
+		ID     string
+		Amount float64
+	}
+	testData := []MockTrade{
+		{ID: "trade-1", Amount: 150.5},
+		{ID: "trade-2", Amount: 75.0},
+	}
+
+	oldStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	err := printOutput(testData)
+	assert.NoError(t, err)
+
+	w.Close()
+	os.Stdout = oldStdout
+
+	var buf bytes.Buffer
+	_, _ = buf.ReadFrom(r)
+	
+	output := buf.String()
+	// Assert headers
+	assert.Contains(t, output, "ID,Amount")
+	// Assert data rows
+	assert.Contains(t, output, "trade-1,150.5")
+	assert.Contains(t, output, "trade-2,75")
+}

@@ -72,3 +72,37 @@ func TestPrintOutput_BrokerQuery(t *testing.T) {
 	_, _ = buf.ReadFrom(r)
 	assert.Contains(t, buf.String(), "test@example.com")
 }
+
+func TestPrintOutput_CSV(t *testing.T) {
+	viper.Reset()
+	viper.Set("output", "csv")
+
+	type MockAccount struct {
+		UUID     string
+		Status   string
+	}
+	testData := []MockAccount{
+		{UUID: "uuid-1", Status: "ACTIVE"},
+		{UUID: "uuid-2", Status: "PENDING"},
+	}
+
+	oldStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	err := printOutput(testData)
+	assert.NoError(t, err)
+
+	w.Close()
+	os.Stdout = oldStdout
+
+	var buf bytes.Buffer
+	_, _ = buf.ReadFrom(r)
+	
+	output := buf.String()
+	// Assert CSV Headers
+	assert.Contains(t, output, "UUID,Status")
+	// Assert CSV field mappings
+	assert.Contains(t, output, "uuid-1,ACTIVE")
+	assert.Contains(t, output, "uuid-2,PENDING")
+}

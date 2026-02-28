@@ -78,5 +78,8 @@ echo -e "\n6. Attempting to Place a Mock Sub-Account Trade..."
 # Submits a simulated AAPL buy order directly on behalf of the provisioned customer
 alpaca-broker trading order-create "$NEW_ACCOUNT_ID" --symbol AAPL --qty 1 --side buy --type market --time-in-force day
 
+echo -e "\n7. Testing CSV Data Export (Accounts)..."
+alpaca-broker accounts list --limit 1 --output csv
+
 echo -e "\n✅ Broker E2E Testing Sequence Initialized successfully."
 echo "Note: Full E2E execution requires firm-level KYC approvals and valid Sandbox Firm accounts for journaling."
