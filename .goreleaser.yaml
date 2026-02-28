@@ -1,0 +1,71 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+project_name: alpaca-cli
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: alpaca-broker
+    main: ./cmd/broker/main/main.go
+    binary: alpaca-broker
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+  - id: alpaca-trader
+    main: ./cmd/trader/main/main.go
+    binary: alpaca-trader
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: default
+    format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore"
+
+brews:
+  - repository:
+      owner: johanhellman
+      name: homebrew-tap
+    directory: Formula
+    homepage: "https://github.com/johanhellman/alpaca-broker-cli"
+    description: "A fast, robust CLI suite for interacting with Alpaca's Broker and Trader APIs."
+    license: "MIT"
+    test: |
+      system "#{bin}/alpaca-broker --help"
+      system "#{bin}/alpaca-trader --help"

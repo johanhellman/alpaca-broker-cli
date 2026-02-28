@@ -6,7 +6,17 @@ A suite of powerful command-line interfaces for interacting with the Alpaca API 
 
 ## Installation
 
-This project requires Go 1.26+. To install locally:
+### Via Homebrew (macOS & Linux)
+
+The easiest way to install the tools is through the custom Homebrew tap:
+
+```bash
+brew install johanhellman/tap/alpaca-cli
+```
+
+### Via Go Toolchain (Developers)
+
+This project requires Go 1.26+. To install locally from source:
 
 ```bash
 git clone https://github.com/johanhellman/alpaca-broker-cli.git
@@ -15,6 +25,10 @@ make install
 ```
 
 This will build and install both `alpaca-broker` and `alpaca-trader` into your `$GOPATH/bin`. Ensure `$GOPATH/bin` is in your `$PATH`.
+
+### Pre-compiled Binaries
+
+You can also download pre-compiled `.tar.gz` or `.zip` archives mapped to your specific OS and CPU Architecture from the [GitHub Releases page](https://github.com/johanhellman/alpaca-broker-cli/releases).
 
 ## Configuration
 
