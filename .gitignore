@@ -17,3 +17,5 @@ coverage.out
 # CI Configuration Exceptions
 !.goreleaser.yaml
 !.github/
+# Added by goreleaser init:
+dist/
