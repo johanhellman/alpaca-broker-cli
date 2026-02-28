@@ -36,7 +36,7 @@ builds:
 
 archives:
   - id: default
-    format: tar.gz
+    formats: [tar.gz]
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ .ProjectName }}_
@@ -48,7 +48,7 @@ archives:
     # use zip for windows archives
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
 
 changelog:
   sort: asc
@@ -58,14 +58,11 @@ changelog:
       - "^test:"
       - "^chore"
 
-brews:
+homebrew_casks:
   - repository:
       owner: johanhellman
       name: homebrew-tap
-    directory: Formula
+    directory: Casks
     homepage: "https://github.com/johanhellman/alpaca-broker-cli"
     description: "A fast, robust CLI suite for interacting with Alpaca's Broker and Trader APIs."
     license: "MIT"
-    test: |
-      system "#{bin}/alpaca-broker --help"
-      system "#{bin}/alpaca-trader --help"
