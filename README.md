@@ -91,7 +91,10 @@ alpaca-trader orders create --file order.json
 
 ## E2E Testing (Sanity Checks)
 
-If you are a contributor working on the `alpaca-trader` binary, you can run the comprehensive End-to-End (E2E) verification script. This script automatically tests Accounts, Assets, Market Data, Watchlists, and complex Order permutations (Limit, Market, Fractional). 
+If you are a contributor working on the CLI binaries, you can run comprehensive End-to-End (E2E) verification scripts located in the `scripts/` directory.
+
+### Trader CLI Tests (Paper API)
+Automatically tests Accounts, Assets, Market Data, Watchlists, and complex Order permutations (Limit, Market, Fractional). 
 
 > **Important**: You **must** provide Alpaca Paper API credentials to run this script. The script aggressively enforces `APCA_ENV="paper"` to prevent accidental live-market mutations.
 
@@ -99,6 +102,15 @@ If you are a contributor working on the `alpaca-trader` binary, you can run the 
 export APCA_API_KEY_ID="your_paper_key"
 export APCA_API_SECRET_KEY="your_paper_secret"
 ./scripts/test-trader-e2e.sh
+```
+
+### Broker CLI Tests (Sandbox API)
+Simulates a full B2B flow: Sub-Account Creation $\rightarrow$ Bank Funding/Journaling $\rightarrow$ Sub-Account Order execution.
+
+```bash
+export ALPACA_BROKER_API_KEY="your_broker_sandbox_key"
+export ALPACA_BROKER_API_SECRET="your_broker_sandbox_secret"
+./scripts/test-broker-e2e.sh
 ```
 
 ## Documentation
