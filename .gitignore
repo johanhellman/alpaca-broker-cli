@@ -12,3 +12,4 @@ alpaca-cli
 .env
 *.yaml
 *.json
+coverage.out
