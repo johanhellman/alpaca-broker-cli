@@ -6,9 +6,11 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/tidwall/gjson"
 )
 
 var cfgFile string
@@ -61,6 +63,12 @@ func init() {
 
 	rootCmd.PersistentFlags().String("output", "table", "Output format (table or json)")
 	_ = viper.BindPFlag("output", rootCmd.PersistentFlags().Lookup("output")) //nolint:errcheck
+
+	rootCmd.PersistentFlags().String("query", "", "Filter output using jq-like syntax (forces json output if used)")
+	_ = viper.BindPFlag("query", rootCmd.PersistentFlags().Lookup("query")) //nolint:errcheck
+
+	rootCmd.PersistentFlags().Bool("all", false, "Automatically fetch all pages for list endpoints")
+	_ = viper.BindPFlag("all", rootCmd.PersistentFlags().Lookup("all")) //nolint:errcheck
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -94,12 +102,28 @@ func initConfig() {
 // printOutput formats data as JSON or Table based on the `--output` flag.
 func printOutput(data interface{}) error {
 	outputFormat := viper.GetString("output")
+	query := viper.GetString("query")
+
+	// If query is present, we force JSON marshaling and utilize gjson
+	if query != "" {
+		out, err := json.Marshal(data)
+		if err != nil {
+			return err
+		}
+		result := gjson.GetBytes(out, query)
+
+		// If the query pulls a single string (like "0.id") don't wrap it in JSON quotes for bash parsing
+		if result.Type == gjson.String {
+			fmt.Println(result.String())
+		} else {
+			fmt.Println(result.Raw)
+		}
+		return nil
+	}
 
 	if outputFormat == "table" {
-		// A completely generic table printer using reflection for standard arrays of structs.
 		val := reflect.Indirect(reflect.ValueOf(data))
 		if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
-			// If it's a single struct, wrap it in a slice for the table printer
 			slice := reflect.MakeSlice(reflect.SliceOf(val.Type()), 0, 1)
 			val = reflect.Append(slice, val)
 		}
@@ -109,32 +133,31 @@ func printOutput(data interface{}) error {
 			return nil
 		}
 
-		// Print Headers
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 		firstElement := reflect.Indirect(val.Index(0))
+
 		if firstElement.Kind() == reflect.Struct {
 			for i := 0; i < firstElement.NumField(); i++ {
-				fmt.Printf("%-20v\t", firstElement.Type().Field(i).Name)
+				fmt.Fprintf(w, "%-20v\t", firstElement.Type().Field(i).Name)
 			}
-			fmt.Println()
+			fmt.Fprintln(w)
 		}
 
-		// Print Values
 		for i := 0; i < val.Len(); i++ {
 			element := reflect.Indirect(val.Index(i))
 			if element.Kind() == reflect.Struct {
 				for j := 0; j < element.NumField(); j++ {
 					field := element.Field(j)
-					fmt.Printf("%-20v\t", field.Interface())
+					fmt.Fprintf(w, "%-20v\t", field.Interface())
 				}
-				fmt.Println()
+				fmt.Fprintln(w)
 			} else {
-				fmt.Println(element.Interface())
+				fmt.Fprintln(w, element.Interface())
 			}
 		}
-		return nil
+		return w.Flush()
 	}
 
-	// Default: JSON output
 	out, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err

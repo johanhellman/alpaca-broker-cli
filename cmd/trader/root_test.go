@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"os"
 	"testing"
 
@@ -36,4 +37,31 @@ func TestExecuteCommand_Trader(t *testing.T) {
 	// but we can ensure the command structure is sound.
 	assert.NotNil(t, RootCmd)
 	assert.Equal(t, "alpaca-trader", RootCmd.Use)
+}
+
+func TestPrintOutput_Query(t *testing.T) {
+	viper.Reset()
+
+	// Simulate --query injection
+	viper.Set("query", "nested.id")
+	testData := map[string]interface{}{
+		"nested": map[string]string{
+			"id": "12345",
+		},
+	}
+
+	// Capture stdout
+	oldStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	err := printOutput(testData)
+	assert.NoError(t, err)
+
+	w.Close()
+	os.Stdout = oldStdout
+
+	var buf bytes.Buffer
+	_, _ = buf.ReadFrom(r)
+	assert.Contains(t, buf.String(), "12345")
 }

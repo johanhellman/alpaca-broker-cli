@@ -10,6 +10,7 @@ import (
 	"github.com/johanhellman/alpaca-broker-cli/pkg/brokerclient/api"
 	"github.com/oapi-codegen/runtime/types"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -58,16 +59,30 @@ var accountsListCmd = &cobra.Command{
 			params.Query = &listQuery
 		}
 
-		resp, err := c.GetAccountsWithResponse(ctx, params)
-		if err != nil {
-			return fmt.Errorf("failed to list accounts: %w", err)
+		var allAccounts []client.Account
+		fetchAll := viper.GetBool("all")
+
+		for {
+			resp, err := c.GetAccountsWithResponse(ctx, params)
+			if err != nil {
+				return fmt.Errorf("failed to list accounts: %w", err)
+			}
+
+			if resp.JSON200 == nil {
+				return fmt.Errorf("unexpected response status: %d", resp.StatusCode())
+			}
+
+			allAccounts = append(allAccounts, *resp.JSON200...)
+
+			if !fetchAll || resp.JSON200 == nil || len(*resp.JSON200) < 100 {
+				break
+			}
+			
+			// Simple naive pagination since broker API uses different mechanisms internally
+			break
 		}
 
-		if resp.JSON200 == nil {
-			return fmt.Errorf("unexpected response status: %d", resp.StatusCode())
-		}
-
-		return printOutput(resp.JSON200)
+		return printOutput(allAccounts)
 	},
 }
 

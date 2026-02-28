@@ -45,3 +45,30 @@ func TestExecuteCommand(t *testing.T) {
 	out := b.String()
 	assert.Contains(t, out, "Usage:")
 }
+
+func TestPrintOutput_BrokerQuery(t *testing.T) {
+	viper.Reset()
+
+	viper.Set("query", "data.user.email")
+	testData := map[string]interface{}{
+		"data": map[string]interface{}{
+			"user": map[string]string{
+				"email": "test@example.com",
+			},
+		},
+	}
+
+	oldStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	err := printOutput(testData)
+	assert.NoError(t, err)
+
+	w.Close()
+	os.Stdout = oldStdout
+
+	var buf bytes.Buffer
+	_, _ = buf.ReadFrom(r)
+	assert.Contains(t, buf.String(), "test@example.com")
+}

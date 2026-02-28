@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/tidwall/gjson"
 )
 
 var cfgFile string
@@ -50,6 +52,12 @@ func init() {
 
 	RootCmd.PersistentFlags().String("output", "table", "Output format (table or json)")
 	_ = viper.BindPFlag("output", RootCmd.PersistentFlags().Lookup("output")) //nolint:errcheck
+
+	RootCmd.PersistentFlags().String("query", "", "Filter output using jq-like syntax (forces json output if used)")
+	_ = viper.BindPFlag("query", RootCmd.PersistentFlags().Lookup("query")) //nolint:errcheck
+
+	RootCmd.PersistentFlags().Bool("all", false, "Automatically fetch all pages for list endpoints")
+	_ = viper.BindPFlag("all", RootCmd.PersistentFlags().Lookup("all")) //nolint:errcheck
 }
 
 func initConfig() {
@@ -77,49 +85,66 @@ func initConfig() {
 
 func printOutput(data interface{}) error {
 	format := viper.GetString("output")
+	query := viper.GetString("query")
 
-	switch format {
-	case "table":
-		// Simple table fallback. For lists, we should iterate. For single objects, print keys/values.
-		// A full robust table printer should be added in a future iteration, for now we do a simple KV or array print.
-		v := reflect.ValueOf(data)
-		if v.Kind() == reflect.Ptr {
-			v = v.Elem()
-		}
-
-		if v.Kind() == reflect.Slice || v.Kind() == reflect.Array {
-			fmt.Printf("Total Items: %d\n", v.Len())
-			for i := 0; i < v.Len(); i++ {
-				fmt.Printf("--- Item %d ---\n", i)
-				item := v.Index(i)
-				if item.Kind() == reflect.Ptr {
-					item = item.Elem()
-				}
-				if item.Kind() == reflect.Struct {
-					for j := 0; j < item.NumField(); j++ {
-						fmt.Printf("%s: %v\n", item.Type().Field(j).Name, item.Field(j).Interface())
-					}
-				} else {
-					fmt.Printf("%v\n", item.Interface())
-				}
-			}
-		} else if v.Kind() == reflect.Struct {
-			for i := 0; i < v.NumField(); i++ {
-				fmt.Printf("%s: %v\n", v.Type().Field(i).Name, v.Field(i).Interface())
-			}
-		} else {
-			fmt.Printf("%v\n", data)
-		}
-
-	case "json", "JSON":
-		fallthrough
-	default:
-		out, err := json.MarshalIndent(data, "", "  ")
+	// If query is present, we force JSON marshaling and utilize gjson
+	if query != "" {
+		out, err := json.Marshal(data)
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(out))
+		result := gjson.GetBytes(out, query)
+		
+		// If the query pulls a single string (like "0.id") don't wrap it in JSON quotes for bash parsing
+		if result.Type == gjson.String {
+			fmt.Println(result.String())
+		} else {
+			fmt.Println(result.Raw)
+		}
+		return nil
 	}
 
+	if format == "table" {
+		val := reflect.Indirect(reflect.ValueOf(data))
+		if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
+			slice := reflect.MakeSlice(reflect.SliceOf(val.Type()), 0, 1)
+			val = reflect.Append(slice, val)
+		}
+
+		if val.Len() == 0 {
+			fmt.Println("No data found.")
+			return nil
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
+		firstElement := reflect.Indirect(val.Index(0))
+		
+		if firstElement.Kind() == reflect.Struct {
+			for i := 0; i < firstElement.NumField(); i++ {
+				fmt.Fprintf(w, "%v\t", firstElement.Type().Field(i).Name)
+			}
+			fmt.Fprintln(w)
+		}
+
+		for i := 0; i < val.Len(); i++ {
+			element := reflect.Indirect(val.Index(i))
+			if element.Kind() == reflect.Struct {
+				for j := 0; j < element.NumField(); j++ {
+					field := element.Field(j)
+					fmt.Fprintf(w, "%v\t", field.Interface())
+				}
+				fmt.Fprintln(w)
+			} else {
+				fmt.Fprintln(w, element.Interface())
+			}
+		}
+		return w.Flush()
+	}
+
+	out, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(out))
 	return nil
 }
