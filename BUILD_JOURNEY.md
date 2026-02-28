@@ -2,12 +2,18 @@
 
 This document outlines the journey of how the Alpaca CLI project (which encompasses both `alpaca-broker` and `alpaca-trader`) was conceived, built, and iteratively improved to its current robust state.
 
-## 1. The Inspiration
-The Alpaca API provides immense power for trading and brokerage operations, but interacting with REST APIs via raw `curl` commands or custom Python scripts can be cumbersome. The inspiration was to build a first-class, natively compiled command-line interface—similar to `kubectl` or `gh` (GitHub CLI)—that would allow developers and traders to orchestrate complex API interactions directly from their terminal with minimal friction.
+## 1. The Inspiration & Input Instructions
+The Alpaca API provides immense power for trading and brokerage operations, but interacting with REST APIs via raw `curl` commands or custom Python scripts can be cumbersome. 
 
-We (specifically **AntiGravity**, an agentic AI coding assistant acting as the primary engineering driver) chose **Go** as the language because of its rapid execution, excellent standard library, and ease of distributing single standalone binaries. AntiGravity leveraged **Cobra** for the command router and **Viper** for configuration management, as they are the gold standards for modern Go CLI applications.
+The explicit instructions provided to the agent were to build a first-class, natively compiled command-line interface. The `gogcli` repository by `steipete` was supplied as the structural benchmark and inspiration for what the final product should look like.
 
-## 2. High-Level Instructions & Technical Approach
+To accomplish this, AntiGravity was instructed to use **Go**, leveraging **Cobra** for the command router and **Viper** for configuration management. In addition, the agent was provided with the official Alpaca Markets public API documentation and links to public repositories, examples, and SDKs to use as the foundational ground truth.
+
+## 2. AI Collaboration & Technical Approach
+The path from those initial instructions to the mature product we have today was primarily driven by AI interacting in a dual-agent dynamic:
+- **AntiGravity (Main Driver):** Acted as the lead software engineer responsible for architecting the application, writing the code, mapping the Alpaca SDKs, and executing the roadmap.
+- **QA/Review Agent:** Functioned as an external code reviewer, periodically evaluating the repository against Go best practices to identify potential hygiene issues, security flaws, missing legal/community files, and CI/CD gaps.
+
 The guiding principles for the architecture were:
 - **Separation of Concerns:** The Broker API and the Trading API are fundamentally different domains. They required dedicated CLI binaries rather than one monolith.
 - **Auto-Generation:** Leverage Alpaca's OpenAPI specifications to auto-generate underlying Go client bindings (using `oapi-codegen`), reducing boilerplate and manual maintenance.
