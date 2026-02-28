@@ -10,14 +10,14 @@ Before iterating on features, the underlying codebase needs to be brought up to 
 - **Hygiene**: Bump outdated dependencies (e.g., Viper, Validator, gRPC) to latest secure versions.
 - **Outcome**: A stable, tested, and automatically validated repository ready for feature additions.
 
-## Iteration 1: Parameterization and Filtering (**Immediate Focus**)
+## Iteration 1: Parameterization and Filtering (**Completed**)
 The current MVP commands rely heavily on raw JSON files (`--file payload.json`) for complex mutations and lack filtering options for lists.
 - **Goal**: Add robust, native command-line flags.
 - **Trader Example**: `alpaca-trader orders create --symbol AAPL --qty 1 --side buy --type market --time-in-force day`
 - **Broker Example**: `alpaca-broker accounts list --status ACTIVE --limit 50`
 - **Outcome**: Users rarely need to hand-write JSON or parse through excessive results to perform standard daily operations.
 
-## Iteration 2: Feature Completeness (Breadth)
+## Iteration 2: Feature Completeness (Breadth) (**Immediate Focus**)
 Expand the command surface area to cover the entirety of both Alpaca API specifications.
 - **Trader API Additions**: 
   - Assets (`alpaca-trader assets`)
