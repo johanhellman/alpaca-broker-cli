@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/alpacahq/alpaca-trade-api-go/v3/alpaca"
+	"github.com/alpacahq/alpaca-trade-api-go/v3/marketdata"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -61,4 +62,19 @@ var accountGetCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(accountCmd)
 	accountCmd.AddCommand(accountGetCmd)
+}
+
+// getMarketDataClient instantiates the Alpaca Market Data API client.
+func getMarketDataClient() (*marketdata.Client, error) {
+	apiKey := viper.GetString("api-key")
+	apiSecret := viper.GetString("api-secret")
+
+	if apiKey == "" || apiSecret == "" {
+		return nil, fmt.Errorf("Missing APCA_API_KEY_ID or APCA_API_SECRET_KEY")
+	}
+
+	return marketdata.NewClient(marketdata.ClientOpts{
+		APIKey:    apiKey,
+		APISecret: apiSecret,
+	}), nil
 }
