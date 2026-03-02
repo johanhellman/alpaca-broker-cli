@@ -30,63 +30,76 @@ This will build and install both `alpaca-broker` and `alpaca-trader` into your `
 
 You can also download pre-compiled `.tar.gz` or `.zip` archives mapped to your specific OS and CPU Architecture from the [GitHub Releases page](https://github.com/johanhellman/alpaca-broker-cli/releases).
 
-## Configuration
+## Global Configuration & Output Flags
 
-Both tools accept configuration via environment variables, flags, or a local YAML config file.
+Both tools accept configuration via environment variables, flags, or local YAML config files (`~/.alpaca-broker.yaml` or `~/.alpaca-trader.yaml`).
 
-### Broker Config (`~/.alpaca-broker.yaml`)
-```yaml
-api-key: "broker-api-key"
-api-secret: "broker-api-secret"
-env: "sandbox" # or production
-```
-Environment Variable Fallbacks: `ALPACA_BROKER_API_KEY`, `ALPACA_BROKER_API_SECRET`, `ALPACA_BROKER_ENV`
+### Common Global Flags
+To maximize composability with standard Unix tools (like `jq`, `grep`, `awk`), every command natively supports advanced output formatting via global flags.
 
-### Trader Config (`~/.alpaca-trader.yaml`)
-```yaml
-api-key: "trader-api-key"
-api-secret: "trader-api-secret"
-env: "paper" # or live
-```
-Environment Variable Fallbacks: `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY`, `APCA_ENV`
+| Flag | Feature | Example Usage |
+|------|---------|---------------|
+| `--output` | Renders output as `table`, `json`, or `csv`. | `alpaca-trader positions list --output csv > pf.csv` |
+| `--query` | Extracts specific nodes using `gjson` syntax (forces JSON). | `alpaca-broker accounts list --query "0.account_number"` |
+| `--all` | Bypasses pagination to pull all available records. | `alpaca-trader orders list --all` |
+| `--env` | Overrides the environment (`sandbox`, `paper`, `live`). | `alpaca-broker funding list --env sandbox` |
+| `--api-key` | Overrides the active API Key. | `alpaca-trader account get --api-key <KEY>` |
+| `--api-secret` | Overrides the active API Secret. | `alpaca-trader account get --api-secret <SECRET>` |
 
-## Quick Start: Broker API
+### Authentication Fallbacks
 
-### Accounts
+**Broker Environment Fallbacks:**
 ```bash
-alpaca-broker accounts list
-alpaca-broker accounts create --file account_payload.json
+export ALPACA_BROKER_API_KEY="your-broker-key"
+export ALPACA_BROKER_API_SECRET="your-broker-secret"
+export ALPACA_BROKER_ENV="sandbox" # or "production"
 ```
 
-### Funding
+**Trader Environment Fallbacks:**
 ```bash
-alpaca-broker funding transfers <account_uuid>
+export APCA_API_KEY_ID="your-trader-key"
+export APCA_API_SECRET_KEY="your-trader-secret"
+export APCA_ENV="paper" # or "live"
 ```
 
-### Trading (Sub-accounts)
+## Complete Command Hierarchies
+
+### `alpaca-broker` commands
+B2B logic to manage retail sub-accounts, fund flows, and execute trades on their behalf.
+
+* **`accounts`**: Create, edit, delete, and list underlying retail customer accounts.
+* **`documents`**: Upload KYC identity documents for strict customer validation.
+* **`funding`**: Execute ACH/Wire transfers and manage banking relationships.
+* **`journals`**: Move capital internally between broker-tier and sub-tier accounts.
+* **`trading`**: Execute trades (`orders`) on behalf of individual sub-accounts.
+* **`events`**: Taps into SSE data-streams to monitor real-time lifecycle events (order fill status, journal approvals, etc).
+
+**Broker Example**:
 ```bash
-alpaca-broker trading orders <account_uuid>
+# Extract the first account number from the sandbox
+alpaca-broker accounts list --all --query "0.account_number"
+
+# Stream live lifecycle events
+alpaca-broker events stream
 ```
 
-## Quick Start: Trading API
+### `alpaca-trader` commands
+Retail workflows governing an individual's specific live or paper account.
 
-### Auto-authenticate with Env Vars
-```bash
-export APCA_API_KEY_ID="yourkey"
-export APCA_API_SECRET_KEY="yoursecret"
-export APCA_ENV="paper"
-```
+* **`account`**: Retrieve core meta-data like buying power and equity.
+* **`positions`**: List current active holdings.
+* **`orders`**: Submit `market`, `limit`, `stop`, `trailing_stop`, and fractional trades.
+* **`watchlists`**: Create, read, update, or delete lists of tracked assets.
+* **`assets`**: Look up standard symbology, fractionability, and margin requirements.
+* **`corporate-actions`**: Monitor dividends and splits affecting the portfolio.
 
-### Account & Positions
+**Trader Example**:
 ```bash
-alpaca-trader account get
-alpaca-trader positions list
-```
+# Buy 1 share of Apple
+alpaca-trader orders create --symbol AAPL --qty 1 --side buy --type market --time_in_force day
 
-### Orders
-```bash
-alpaca-trader orders list
-alpaca-trader orders create --file order.json
+# Export all active positions to CSV format
+alpaca-trader positions list --output csv > positions.csv
 ```
 
 ## E2E Testing (Sanity Checks)
