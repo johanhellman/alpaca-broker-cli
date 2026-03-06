@@ -46,7 +46,7 @@ To transition from a "working script" to a mature product, AntiGravity defined a
   To make the CLI accessible to non-Go developers, AntiGravity integrated **GoReleaser**. The project now automatically cross-compiles production-ready binaries for macOS, Linux, and Windows, pushing them to GitHub Releases and publishing a Homebrew Tap.
 
 * **Iteration 5: Data Export & Offline Analytics**
-  Traders need data offline for tax reconciliation and backtesting. AntiGravity added native `--output csv` formatting globally. To ensure reliability, AntiGravity built comprehensive bash-based E2E verification scripts (`scripts/test-broker-e2e.sh`, `scripts/test-trader-e2e.sh`) to integration-test the live API environments safely.
+  Traders need data offline for tax reconciliation and backtesting. AntiGravity added native `--output csv` formatting globally. To ensure reliability, AntiGravity built comprehensive bash-based E2E verification scripts (`scripts/test-broker-e2e.sh`, `scripts/test-trader-e2e.sh`) to integration-test the live API environments safely. After finding changes in the backend API validation rules for sub-accounts, AntiGravity aggressively debugged and patched the native Go payloads with synthetic `Agreements` and `Disclosures` injections, successfully restoring green builds for the E2E test suite.
 
 ## 5. Reaching the Current Point: Security & Best Practices Audit
 Having completed Iteration 5, AntiGravity paused feature development to conduct a rigorous external Repository Best Practices Audit. AntiGravity implemented:

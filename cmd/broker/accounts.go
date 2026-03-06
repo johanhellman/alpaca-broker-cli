@@ -187,9 +187,36 @@ Example:
 			identity.FundingSource = []client.IdentityFundingSource{}
 		}
 
+		agreements := client.Agreements{
+			{
+				Agreement: client.AgreementAgreement("account_agreement"),
+				IpAddress: "127.0.0.1",
+				SignedAt:  time.Now().Format(time.RFC3339),
+			},
+			{
+				Agreement: client.AgreementAgreement("customer_agreement"),
+				IpAddress: "127.0.0.1",
+				SignedAt:  time.Now().Format(time.RFC3339),
+			},
+			{
+				Agreement: client.AgreementAgreement("margin_agreement"),
+				IpAddress: "127.0.0.1",
+				SignedAt:  time.Now().Format(time.RFC3339),
+			},
+		}
+
+		disclosures := client.Disclosures{
+			IsControlPerson:             false,
+			IsAffiliatedExchangeOrFinra: false,
+			IsPoliticallyExposed:        false,
+			ImmediateFamilyExposed:      false,
+		}
+
 		reqBody := client.AccountCreationRequest{
-			Contact:  &contact,
-			Identity: &identity,
+			Contact:     &contact,
+			Identity:    &identity,
+			Agreements:  &agreements,
+			Disclosures: &disclosures,
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
