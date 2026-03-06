@@ -49,7 +49,7 @@ To be production-ready and easily adopted by other developers or traders, the pr
 Traders and brokers need to reconcile data offline for accounting, taxes, or strategy backtesting. This is a natural extension of the tabular output features introduced in Iteration 3.
 - **Goal**: Make the CLI a first-class data ingestion tool.
 - [x] **Feature**: Support `--output csv` natively across all data endpoints to inject directly into reporting pipelines.
-- [x] **Feature**: Map comprehensive local validation shells `scripts/test-trader-e2e.sh` and `scripts/test-broker-e2e.sh` to track system functionality against Live parameters.
+- [x] **Feature**: Map comprehensive local validation shells `scripts/test-trader-e2e.sh` and `scripts/test-broker-e2e.sh` to track system functionality against Live parameters (maintained and patched by AntiGravity).
 
 ## Iteration 6: Multi-Environment & Secure Credential Management (**Planned**)
 As users scale, they will likely manage multiple accounts (e.g., Paper vs Live, or multiple Broker sub-environments). Environment variables will always remain supported as the fundamental configuration layer, but power users need faster context switching.

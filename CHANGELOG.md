@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete Iteration 2 commands for Trader and Broker CLI (assets, watchlists, journals, documents, events).
 - Iteration 1 parameterization (refactored to native CLI flags removing json payloads).
 - Native csv formatting to cli output pipelines.
-- Comprehensive sandbox and paper trading verification e2e scripts.
+- Comprehensive sandbox and paper trading verification e2e scripts (restored to green by AntiGravity).
 - GoReleaser and GitHub Actions publishing pipeline.
 - Automated API markdown documentation generation for both Broker and Trader pipelines.
 - Dependabot configuration for go modules and GitHub Actions.
@@ -25,4 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed dead code, gocyclo complexity, and errcheck violations from the technical hygiene review.
 - Missing binaries in `make install`.
+- [AntiGravity] Fixed Broker API `400` validation errors regarding missing `Agreements`, `Disclosures`, and strictly synthetic `tax_id`s in the `accounts create` payload.
+- [AntiGravity] Fixed trailing flag conflicts (`--limit` and `--query`) breaking `test-broker-e2e.sh`.
 - Goreleaser `v2` deprecation warnings.

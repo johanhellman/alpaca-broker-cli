@@ -5,10 +5,20 @@ echo "=============================================="
 echo "    Alpaca Trader CLI E2E Paper Test Suite    "
 echo "=============================================="
 
+# Attempt to load .env from project root if variables are missing
+if [ -z "$APCA_API_KEY_ID" ] || [ -z "$APCA_API_SECRET_KEY" ]; then
+  ENV_FILE="$(dirname "$0")/../.env"
+  if [ -f "$ENV_FILE" ]; then
+    set -a
+    source "$ENV_FILE"
+    set +a
+  fi
+fi
+
 # Check for required authentication variables
 if [ -z "$APCA_API_KEY_ID" ] || [ -z "$APCA_API_SECRET_KEY" ]; then
   echo "❌ Error: APCA_API_KEY_ID and APCA_API_SECRET_KEY must be set."
-  echo "Please export your Paper API credentials before running this test."
+  echo "Please export your Paper API credentials before running this test, or set them in the .env file."
   exit 1
 fi
 

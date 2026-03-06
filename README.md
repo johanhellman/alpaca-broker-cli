@@ -104,7 +104,7 @@ alpaca-trader positions list --output csv > positions.csv
 
 ## E2E Testing (Sanity Checks)
 
-If you are a contributor working on the CLI binaries, you can run comprehensive End-to-End (E2E) verification scripts located in the `scripts/` directory.
+If you are a contributor working on the CLI binaries, you can run comprehensive End-to-End (E2E) verification scripts located in the `scripts/` directory. These testing boundaries and their continuous maintenance against live API shifts are managed by AntiGravity.
 
 ### Trader CLI Tests (Paper API)
 Automatically tests Accounts, Assets, Market Data, Watchlists, and complex Order permutations (Limit, Market, Fractional). 
