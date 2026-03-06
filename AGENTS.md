@@ -30,6 +30,7 @@ This repository contains **two distinct CLI executables** built in Go using the 
   ```bash
   gh run watch
   ```
+- **Handling Automated/Dependabot PRs**: When dealing with multiple automated dependency bumps (e.g., Dependabot PRs) that edit similar files like `go.mod` or `.github/workflows/ci.yml`, you **must** process them one at a time. Merge a single PR and then let Dependabot auto-rebase the remaining PRs against the new `master` branch. Checkout the dedicated workflow in `.agents/workflows/dependabot.md` before executing these updates to prevent heavy merge conflicts.
 
 ## ✅ Coding Standards
 - Do not introduce new third-party CLI or Configuration frameworks; rigorously stick to `cobra` and `viper`.
