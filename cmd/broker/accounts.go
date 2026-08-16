@@ -13,29 +13,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	// List flags
-	listQuery string
-
-	// Create flags
-	createContactEmail      string
-	createContactPhone      string
-	createContactStreet1    string
-	createContactStreet2    string
-	createContactCity       string
-	createContactState      string
-	createContactPostalCode string
-	createIDGivenName       string
-	createIDFamilyName      string
-	createIDDOB             string
-	createIDTaxID           string
-	createIDTaxType         string
-	createIDCountryTax      string
-	createIDCountryBirth    string
-	createIDCountryCitizen  string
-	createFundingSourceType string
-)
-
 var accountsCmd = &cobra.Command{
 	Use:   "accounts",
 	Short: "Manage Alpaca Broker accounts",
@@ -54,6 +31,7 @@ var accountsListCmd = &cobra.Command{
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
+		listQuery, _ := cmd.Flags().GetString("query")
 		params := &client.GetAccountsParams{}
 		if listQuery != "" {
 			params.Query = &listQuery
@@ -131,6 +109,24 @@ Example:
 		if err != nil {
 			return err
 		}
+
+
+		createContactEmail, _ := cmd.Flags().GetString("contact-email")
+		createContactPhone, _ := cmd.Flags().GetString("contact-phone")
+		createContactStreet1, _ := cmd.Flags().GetString("contact-street-1")
+		createContactStreet2, _ := cmd.Flags().GetString("contact-street-2")
+		createContactCity, _ := cmd.Flags().GetString("contact-city")
+		createContactState, _ := cmd.Flags().GetString("contact-state")
+		createContactPostalCode, _ := cmd.Flags().GetString("contact-postal")
+		createIDGivenName, _ := cmd.Flags().GetString("id-given-name")
+		createIDFamilyName, _ := cmd.Flags().GetString("id-family-name")
+		createIDDOB, _ := cmd.Flags().GetString("id-dob")
+		createIDTaxID, _ := cmd.Flags().GetString("id-tax-id")
+		createIDTaxType, _ := cmd.Flags().GetString("id-tax-type")
+		createIDCountryTax, _ := cmd.Flags().GetString("id-country-tax")
+		createIDCountryBirth, _ := cmd.Flags().GetString("id-country-birth")
+		createIDCountryCitizen, _ := cmd.Flags().GetString("id-country-citizen")
+		createFundingSourceType, _ := cmd.Flags().GetString("funding-source-type")
 
 		dobTime, err := time.Parse("2006-01-02", createIDDOB)
 		if err != nil {
@@ -239,34 +235,34 @@ func init() {
 	rootCmd.AddCommand(accountsCmd)
 
 	// list flags
-	accountsListCmd.Flags().StringVar(&listQuery, "query", "", "Space-delimited partial match search (names, emails, account numbers)")
+	accountsListCmd.Flags().String( "query", "", "Space-delimited partial match search (names, emails, account numbers)")
 	accountsCmd.AddCommand(accountsListCmd)
 
 	accountsCmd.AddCommand(accountsGetCmd)
 
 	// create flags
-	accountsCreateCmd.Flags().StringVar(&createContactEmail, "contact-email", "", "Contact email address")
+	accountsCreateCmd.Flags().String( "contact-email", "", "Contact email address")
 	_ = accountsCreateCmd.MarkFlagRequired("contact-email") //nolint:errcheck
-	accountsCreateCmd.Flags().StringVar(&createContactPhone, "contact-phone", "", "Contact phone number (with country code, no hyphens)")
-	accountsCreateCmd.Flags().StringVar(&createContactStreet1, "contact-street-1", "", "Contact street address line 1")
-	accountsCreateCmd.Flags().StringVar(&createContactStreet2, "contact-street-2", "", "Contact street address line 2")
-	accountsCreateCmd.Flags().StringVar(&createContactCity, "contact-city", "", "Contact city")
-	accountsCreateCmd.Flags().StringVar(&createContactState, "contact-state", "", "Contact state/province")
-	accountsCreateCmd.Flags().StringVar(&createContactPostalCode, "contact-postal", "", "Contact postal code")
+	accountsCreateCmd.Flags().String( "contact-phone", "", "Contact phone number (with country code, no hyphens)")
+	accountsCreateCmd.Flags().String( "contact-street-1", "", "Contact street address line 1")
+	accountsCreateCmd.Flags().String( "contact-street-2", "", "Contact street address line 2")
+	accountsCreateCmd.Flags().String( "contact-city", "", "Contact city")
+	accountsCreateCmd.Flags().String( "contact-state", "", "Contact state/province")
+	accountsCreateCmd.Flags().String( "contact-postal", "", "Contact postal code")
 
-	accountsCreateCmd.Flags().StringVar(&createIDGivenName, "id-given-name", "", "Account owner's first name")
+	accountsCreateCmd.Flags().String( "id-given-name", "", "Account owner's first name")
 	_ = accountsCreateCmd.MarkFlagRequired("id-given-name") //nolint:errcheck
-	accountsCreateCmd.Flags().StringVar(&createIDFamilyName, "id-family-name", "", "Account owner's last name")
+	accountsCreateCmd.Flags().String( "id-family-name", "", "Account owner's last name")
 	_ = accountsCreateCmd.MarkFlagRequired("id-family-name") //nolint:errcheck
-	accountsCreateCmd.Flags().StringVar(&createIDDOB, "id-dob", "", "Date of birth (YYYY-MM-DD)")
+	accountsCreateCmd.Flags().String( "id-dob", "", "Date of birth (YYYY-MM-DD)")
 	_ = accountsCreateCmd.MarkFlagRequired("id-dob") //nolint:errcheck
-	accountsCreateCmd.Flags().StringVar(&createIDTaxID, "id-tax-id", "", "Tax ID / SSN")
-	accountsCreateCmd.Flags().StringVar(&createIDTaxType, "id-tax-type", "", "USA_SSN, AUS_TFN, etc.")
-	accountsCreateCmd.Flags().StringVar(&createIDCountryTax, "id-country-tax", "USA", "ISO 3166-1 alpha-3 country of tax residence")
-	accountsCreateCmd.Flags().StringVar(&createIDCountryBirth, "id-country-birth", "", "ISO 3166-1 alpha-3 country of birth")
-	accountsCreateCmd.Flags().StringVar(&createIDCountryCitizen, "id-country-citizen", "", "ISO 3166-1 alpha-3 country of citizenship")
+	accountsCreateCmd.Flags().String( "id-tax-id", "", "Tax ID / SSN")
+	accountsCreateCmd.Flags().String( "id-tax-type", "", "USA_SSN, AUS_TFN, etc.")
+	accountsCreateCmd.Flags().String( "id-country-tax", "USA", "ISO 3166-1 alpha-3 country of tax residence")
+	accountsCreateCmd.Flags().String( "id-country-birth", "", "ISO 3166-1 alpha-3 country of birth")
+	accountsCreateCmd.Flags().String( "id-country-citizen", "", "ISO 3166-1 alpha-3 country of citizenship")
 
-	accountsCreateCmd.Flags().StringVar(&createFundingSourceType, "funding-source-type", "", "employment_income, investments, etc.")
+	accountsCreateCmd.Flags().String( "funding-source-type", "", "employment_income, investments, etc.")
 
 	accountsCmd.AddCommand(accountsCreateCmd)
 }
